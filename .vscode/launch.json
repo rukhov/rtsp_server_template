@@ -8,13 +8,13 @@
             "name": "Linux - Integration Tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/live555-test",
+            "program": "${workspaceFolder}/../build/live555-test",
             "args": [
             ],
             "environment": [
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build",
+            "cwd": "${workspaceFolder}/../build",
             "externalConsole": false,
             "avoidWindowsConsoleRedirection": true,
             "setupCommands": [

@@ -14,9 +14,10 @@ target_link_libraries(${TARGET}
     #PRIVATE opencv_core opencv_videoio opencv_highgui
     PRIVATE unofficial::liveMedia unofficial::groupsock unofficial::BasicUsageEnvironment unofficial::UsageEnvironment
     PRIVATE OpenSSL::SSL
-    PRIVATE /home/rukhov/projects/arena/live555test/build/vcpkg_installed/x64-linux/lib/libx264.a
+    PRIVATE /home/rukhov/projects/github/rtsp_server_sample/build/vcpkg_installed/x64-linux/lib/libx264.a
  )
 
 target_sources(${TARGET} PRIVATE
-    main-x264.cpp
+    #main-x264.cpp
+    testH264VideoStreamer.cpp
 )
