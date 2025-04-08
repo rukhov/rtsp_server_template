@@ -1,0 +1,17 @@
+{
+  "dependencies": [
+    "boost",
+    "gtest",
+    {
+      "name": "opencv4",
+      "features": [
+        "gstreamer"
+      ]
+    },
+    "live555",
+    "x264"
+  ],
+  "vcpkg-configuration": {
+    "overlay-ports": ["cmake/ports"]
+  }
+}
