@@ -8,6 +8,8 @@
         "gstreamer"
       ]
     },
+    "gstreamer",
+    "gst-rtsp-server",
     "live555",
     "x264"
   ],

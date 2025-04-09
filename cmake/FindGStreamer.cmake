@@ -55,15 +55,27 @@ set(GSTREAMER_TARGET_NAME GStreamer)
 add_library(${GSTREAMER_TARGET_NAME}::GStreamer STATIC IMPORTED)
 
 target_link_libraries(${GSTREAMER_TARGET_NAME}::GStreamer 
-    INTERFACE ${GLIB_LIBS_DIR}/libgobject-2.0.a
-    INTERFACE ${GLIB_LIBS_DIR}/libgmodule-2.0.a
-    INTERFACE ${GLIB_LIBS_DIR}/libglib-2.0.a
-    INTERFACE libffi
-    INTERFACE PCRE2::8BIT
     INTERFACE ${GSTREAMER_LIBS_DIR}/libgstreamer-1.0.a
+
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgstrtp-1.0.a
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgstsdp-1.0.a
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgstrtsp-1.0.a
+    
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgstpbutils-1.0.a
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgstvideo-1.0.a
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgsttag-1.0.a
+
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgstnet-1.0.a
 
     INTERFACE ${GSTREAMER_LIBS_DIR}/libgstapp-1.0.a
     INTERFACE ${GSTREAMER_LIBS_DIR}/libgstbase-1.0.a
+
+    INTERFACE ${GLIB_LIBS_DIR}/libgio-2.0.a
+    INTERFACE ${GLIB_LIBS_DIR}/libgobject-2.0.a
+    INTERFACE ${GLIB_LIBS_DIR}/libgmodule-2.0.a
+    INTERFACE ${GLIB_LIBS_DIR}/libglib-2.0.a
+    INTERFACE PCRE2::8BIT
+    INTERFACE libffi
 )
 
 target_include_directories(${GSTREAMER_TARGET_NAME}::GStreamer  INTERFACE
@@ -72,4 +84,14 @@ target_include_directories(${GSTREAMER_TARGET_NAME}::GStreamer  INTERFACE
 
 set_property(TARGET ${GSTREAMER_TARGET_NAME}::GStreamer
     PROPERTY IMPORTED_LOCATION ${GSTREAMER_LIBS_DIR}/libgstreamer-1.0.a
+)
+
+add_library(${GSTREAMER_TARGET_NAME}::GstRtspServer STATIC IMPORTED)
+
+target_link_libraries(${GSTREAMER_TARGET_NAME}::GstRtspServer
+    INTERFACE ${GSTREAMER_LIBS_DIR}/libgstrtspserver-1.0.a
+)
+
+set_property(TARGET ${GSTREAMER_TARGET_NAME}::GstRtspServer
+    PROPERTY IMPORTED_LOCATION ${GSTREAMER_LIBS_DIR}/libgstrtspserver-1.0.a
 )
