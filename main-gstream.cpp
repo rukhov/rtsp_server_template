@@ -3,101 +3,63 @@
 #include <iostream>
 #include <string>
 
+#include "GstColorBarsVideoSrc.h"
+
 #define DEFAULT_RTSP_PORT "8554"
+#define DEFAULT_MOUNT_POINT "/test"
+#define DEFAULT_H264_FILE "test.h264"
 
 static char *port = (char *)DEFAULT_RTSP_PORT;
-static char *file_path = NULL;
+static char *mount_point = (char *)DEFAULT_MOUNT_POINT;
+static char *file_location = (char *)DEFAULT_H264_FILE;
 
-// Structure to hold our pipeline information
-struct CustomData {
-    GstRTSPServer *server;
-    GstRTSPMediaFactory *factory;
-};
 
-// Callback when media is configured - we can add the file source here
-static void media_configured(GstRTSPMediaFactory *factory, GstRTSPMedia *media, gpointer user_data) {
-    GstElement *element, *filesrc;
-    CustomData *data = (CustomData *)user_data;
+ int
+ main (int argc, char *argv[])
+ {
+   GMainLoop *loop;
+   GstRTSPServer *server;
+   GstRTSPMountPoints *mounts;
+   GstRTSPMediaFactory *factory;
+ 
+   gst_init (&argc, &argv);
 
-    // Get the pipeline from the media
-    element = gst_rtsp_media_get_element(media);
+   gst_gst_color_bars_video_src_register();
+ 
+   loop = g_main_loop_new (NULL, FALSE);
+ 
+   /* create a server instance */
+   server = gst_rtsp_server_new ();
 
-    // Create a filesrc element
-    filesrc = gst_element_factory_make("filesrc", "file-source");
-    g_object_set(filesrc, "location", file_path, NULL);
-
-    // Get the payloader element from the pipeline
-    GstElement *payloader = gst_bin_get_by_name(GST_BIN(element), "pay0");
-
-    // Create a queue element
-    GstElement *queue = gst_element_factory_make("queue", "queue");
-
-    // Add the filesrc and queue to the pipeline before the payloader
-    gst_bin_add_many(GST_BIN(element), filesrc, queue, NULL);
-
-    // Link the filesrc to the queue and then to the payloader
-    if (!gst_element_link_many(filesrc, queue, payloader, NULL)) {
-        g_printerr("Elements could not be linked.\n");
-    }
-
-    gst_object_unref(payloader);
-    gst_object_unref(element);
-}
-
-int main(int argc, char *argv[]) {
-    GMainLoop *loop;
-    CustomData data;
-
-    if (argc < 2) {
-        g_printerr("Usage: %s <H264 file> [port]\n", argv[0]);
-        return -1;
-    }
-
-    file_path = argv[1];
-    if (argc > 2) {
-        port = argv[2];
-    }
-
-    // Initialize GStreamer
-    gst_init(&argc, &argv);
-
-    // Create main loop
-    loop = g_main_loop_new(NULL, FALSE);
-
-    // Create RTSP server
-    data.server = gst_rtsp_server_new();
-    g_object_set(data.server, "service", port, NULL);
-
-    // Create a media factory for H264 streams
-    data.factory = gst_rtsp_media_factory_new();
-    
-    // Set the launch pipeline - this will be enhanced in the media_configured callback
-    gst_rtsp_media_factory_set_launch(data.factory, 
-        "( appsrc name=src ! h264parse ! rtph264pay name=pay0 pt=96 )");
-
-    // Set the shared property so multiple clients can connect
-    gst_rtsp_media_factory_set_shared(data.factory, TRUE);
-
-    // Connect the media configured signal
-    g_signal_connect(data.factory, "media-configured", (GCallback)media_configured, &data);
-
-    // Get the mount points from the server and add our factory to it
-    GstRTSPMountPoints *mounts = gst_rtsp_server_get_mount_points(data.server);
-    gst_rtsp_mount_points_add_factory(mounts, "/test", data.factory);
-    g_object_unref(mounts);
-
-    // Attach the server to the main context
-    gst_rtsp_server_attach(data.server, NULL);
-
-    // Print the stream URL
-    g_print("Stream ready at rtsp://127.0.0.1:%s/test\n", port);
-
-    // Start the main loop
-    g_main_loop_run(loop);
-
-    // Clean up
-    g_main_loop_unref(loop);
-    g_object_unref(data.server);
-
-    return 0;
-}
+   g_object_set(server, "service", port, NULL);
+ 
+   /* get the mount points for this server, every server has a default object
+    * that be used to map uri mount points to media factories */
+   mounts = gst_rtsp_server_get_mount_points (server);
+ 
+   /* make a media factory for a test stream. The default media factory can use
+    * gst-launch syntax to create pipelines. 
+    * any launch line works as long as it contains elements named pay%d. Each
+    * element with pay%d names will be a stream */
+   factory = gst_rtsp_media_factory_new ();
+   //gst_rtsp_media_factory_set_launch (factory, "( videotestsrc is-live=1 ! x264enc ! rtph264pay name=pay0 pt=96 )");
+   gst_rtsp_media_factory_set_launch (factory, "( gst_color_bars_video_src ! x264enc ! rtph264pay name=pay0 pt=96 )");
+ 
+   gst_rtsp_media_factory_set_shared (factory, TRUE);
+ 
+   /* attach the test factory to the /test url */
+   gst_rtsp_mount_points_add_factory (mounts, "/test", factory);
+ 
+   /* don't need the ref to the mapper anymore */
+   g_object_unref (mounts);
+ 
+   /* attach the server to the default maincontext */
+   gst_rtsp_server_attach (server, NULL);
+ 
+   /* start serving */
+   g_print ("stream ready at rtsp://127.0.0.1:8554/test\n");
+   g_main_loop_run (loop);
+ 
+   return 0;
+ }
+ 

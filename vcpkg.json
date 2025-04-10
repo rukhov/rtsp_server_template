@@ -8,7 +8,11 @@
         "gstreamer"
       ]
     },
-    "gstreamer",
+    {
+      "name": "gstreamer",
+      "features": [
+      ]
+    },
     "gst-rtsp-server",
     "live555",
     "x264"
