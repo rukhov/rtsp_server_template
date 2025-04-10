@@ -49,7 +49,11 @@
 
 #include <gst/gst.h>
 
-G_BEGIN_DECLS
+namespace gst {
+    class GstColorBars;
+}
+
+//G_BEGIN_DECLS
 
 #define GST_TYPE_GSTCOLORBARSVIDEOSRC (gst_gst_color_bars_video_src_get_type())
 G_DECLARE_FINAL_TYPE (GstGstColorBarsVideoSrc, gst_gst_color_bars_video_src,
@@ -62,10 +66,16 @@ struct _GstGstColorBarsVideoSrc
   GstPad *sinkpad, *srcpad;
 
   gboolean silent;
+
+  gst::GstColorBars *color_bars;
+
+  static void set_property (GObject * object, guint prop_id, const GValue * value, GParamSpec * pspec);
+  static void get_property (GObject * object, guint prop_id, GValue * value, GParamSpec * pspec);
+  static void finalize(GObject *object);
 };
 
 void gst_gst_color_bars_video_src_register();
 
-G_END_DECLS
+//G_END_DECLS
 
 #endif /* __GST_GSTCOLORBARSVIDEOSRC_H__ */

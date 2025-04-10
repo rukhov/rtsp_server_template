@@ -63,6 +63,7 @@
 #include <gst/gst.h>
 
 #include "GstColorBarsVideoSrc.h"
+#include "gst-color-bars.h"
 
 GST_DEBUG_CATEGORY_STATIC (gst_gst_color_bars_video_src_debug);
 #define GST_CAT_DEFAULT gst_gst_color_bars_video_src_debug
@@ -124,8 +125,9 @@ gst_gst_color_bars_video_src_class_init (GstGstColorBarsVideoSrcClass * klass)
   gobject_class = (GObjectClass *) klass;
   gstelement_class = (GstElementClass *) klass;
 
-  gobject_class->set_property = gst_gst_color_bars_video_src_set_property;
-  gobject_class->get_property = gst_gst_color_bars_video_src_get_property;
+  gobject_class->set_property = _GstGstColorBarsVideoSrc::set_property;
+  gobject_class->get_property = _GstGstColorBarsVideoSrc::get_property;
+  gobject_class->finalize = _GstGstColorBarsVideoSrc::finalize;
 
   g_object_class_install_property (gobject_class, PROP_SILENT,
       g_param_spec_boolean ("silent", "Silent", "Produce verbose output ?",
@@ -147,8 +149,7 @@ gst_gst_color_bars_video_src_class_init (GstGstColorBarsVideoSrcClass * klass)
  * set pad callback functions
  * initialize instance structure
  */
-static void
-gst_gst_color_bars_video_src_init (GstGstColorBarsVideoSrc * filter)
+static void gst_gst_color_bars_video_src_init (GstGstColorBarsVideoSrc * filter)
 {
   filter->sinkpad = gst_pad_new_from_static_template (&sink_factory, "sink");
   gst_pad_set_event_function (filter->sinkpad,
@@ -163,38 +164,8 @@ gst_gst_color_bars_video_src_init (GstGstColorBarsVideoSrc * filter)
   gst_element_add_pad (GST_ELEMENT (filter), filter->srcpad);
 
   filter->silent = FALSE;
-}
 
-static void
-gst_gst_color_bars_video_src_set_property (GObject * object, guint prop_id,
-    const GValue * value, GParamSpec * pspec)
-{
-  GstGstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC (object);
-
-  switch (prop_id) {
-    case PROP_SILENT:
-      filter->silent = g_value_get_boolean (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-  }
-}
-
-static void
-gst_gst_color_bars_video_src_get_property (GObject * object, guint prop_id,
-    GValue * value, GParamSpec * pspec)
-{
-  GstGstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC (object);
-
-  switch (prop_id) {
-    case PROP_SILENT:
-      g_value_set_boolean (value, filter->silent);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-  }
+  filter->color_bars = gst::make_GstColorBars();
 }
 
 /* GstElement vmethod implementations */
@@ -287,6 +258,42 @@ GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
     gstcolorbarsvideosrc_init,
     PACKAGE_VERSION, GST_LICENSE, GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN)
 */
+
+void _GstGstColorBarsVideoSrc::set_property(GObject * object, guint prop_id, const GValue * value, GParamSpec * pspec)
+{
+  GstGstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC (object);
+
+  switch (prop_id) {
+    case PROP_SILENT:
+      filter->silent = g_value_get_boolean (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+  }
+}
+
+void _GstGstColorBarsVideoSrc::get_property(GObject * object, guint prop_id, GValue * value, GParamSpec * pspec)
+{
+  GstGstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC (object);
+
+  switch (prop_id) {
+    case PROP_SILENT:
+      g_value_set_boolean (value, filter->silent);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+  }
+}
+
+void _GstGstColorBarsVideoSrc::finalize(GObject *object)
+{
+  GstGstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC (object);
+  delete filter->color_bars;
+  filter->color_bars = nullptr;
+  G_OBJECT_CLASS (parent_class)->finalize (object);
+}
 
 void gst_gst_color_bars_video_src_register() {
   //GST_TYPE_GSTCOLORBARSVIDEOSRC;

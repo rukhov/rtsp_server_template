@@ -39,5 +39,5 @@ target_sources(${TARGET} PRIVATE
     #testH264VideoStreamer.cpp
     main-gstream.cpp
     gst-color-bars.cpp
-    GstColorBarsVideoSrc.c
+    GstColorBarsVideoSrc.cpp
 )

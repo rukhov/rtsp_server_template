@@ -2,7 +2,7 @@
 
 namespace gst {
 
-    class GstColorBars : public GstElement {
+    class GstColorBars {
         public:
         virtual ~GstColorBars() = default;
 

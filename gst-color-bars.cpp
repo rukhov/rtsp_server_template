@@ -4,13 +4,26 @@
 
 namespace {
 
+    using namespace gst;
 
+    class GstColorBarsImpl : public GstColorBars
+    {
+    public:
+        GstColorBarsImpl(){
+
+        }
+
+        ~GstColorBarsImpl() override {
+
+        }
+
+    };
 }
 
 namespace gst {
 
-    void GstColorBars::register_element()
+    GstColorBars *make_GstColorBars()
     {
-
+        return new GstColorBarsImpl();
     }
 }
