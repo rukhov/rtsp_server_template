@@ -24,7 +24,7 @@ static char *file_location = (char *)DEFAULT_H264_FILE;
  
    gst_init (&argc, &argv);
 
-   gst_gst_color_bars_video_src_register();
+   gst_color_bars_video_src_register();
  
    loop = g_main_loop_new (NULL, FALSE);
  
