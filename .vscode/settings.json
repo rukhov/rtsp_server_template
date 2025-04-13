@@ -1,5 +1,17 @@
 {
     "files.associations": {
         "format": "cpp"
-    }
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    //"editor.defaultFormatter": "xaver.clang-format",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "editor.formatOnType": true,
+    "editor.renderWhitespace": "trailing",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "files.eol": "\n",
+    "editor.detectIndentation": true,
 }
