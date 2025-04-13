@@ -2,16 +2,18 @@
 #define __GST_GSTCOLORBARSVIDEOSRC_H__
 
 #include <gst/gst.h>
+#include <gst/video/gstvideometa.h>
 
-namespace gst {
-    class GstColorBars;
+namespace gst
+{
+  class GstColorBars;
 }
 
-//G_BEGIN_DECLS
+// G_BEGIN_DECLS
 
 #define GST_TYPE_GSTCOLORBARSVIDEOSRC (gst_color_bars_video_src_get_type())
-G_DECLARE_FINAL_TYPE (GstColorBarsVideoSrc, gst_color_bars_video_src,
-    GST, GSTCOLORBARSVIDEOSRC, GstPushSrc)
+G_DECLARE_FINAL_TYPE(GstColorBarsVideoSrc, gst_color_bars_video_src,
+                     GST, GSTCOLORBARSVIDEOSRC, GstPushSrc)
 
 struct _GstColorBarsVideoSrc
 {
@@ -19,21 +21,23 @@ struct _GstColorBarsVideoSrc
 
   GstPad *sinkpad, *srcpad;
 
+  std::string _negotiated_caps;
+  GstVideoInfo _video_info;
   gboolean silent;
 
   gst::GstColorBars *color_bars;
-  size_t frames_sent = 0;
+  size_t _frames_sent = 0;
 
-  static void set_property (GObject * object, guint prop_id, const GValue * value, GParamSpec * pspec);
-  static void get_property (GObject * object, guint prop_id, GValue * value, GParamSpec * pspec);
+  static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec);
+  static void get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec);
   static void finalize(GObject *object);
-  static gboolean _start (GstBaseSrc *object);
-  static GstFlowReturn create (GstPushSrc * src, GstBuffer ** buf);
-  static gboolean setcaps (GstBaseSrc * bsrc, GstCaps * caps);
+  static gboolean _start(GstBaseSrc *object);
+  static GstFlowReturn create(GstPushSrc *src, GstBuffer **buf);
+  static gboolean setcaps(GstBaseSrc *bsrc, GstCaps *caps);
 };
 
 void gst_color_bars_video_src_register();
 
-//G_END_DECLS
+// G_END_DECLS
 
 #endif /* __GST_GSTCOLORBARSVIDEOSRC_H__ */

@@ -9,14 +9,16 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/../build/rtsp_server_sample",
-            "args": [
-            ],
+            "args": [],
             "environment": [
                 //{"name":"LD_LIBRARY_PATH", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg",
                 //{"name":"PATH", "value": "${workspaceFolder}/..build/vcpkg_installed/x64-linux/tools/gstreamer"},
                 //{"name":"GST_PLUGIN_PATH", "value": "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"},
                 //{"name":"GST_PLUGIN_PATH", "value": "/usr/lib/x86_64-linux-gnu/gstreamer-1.0"},
-                {"name":"GST_DEBUG", "value": "3"},
+                {
+                    "name": "GST_DEBUG",
+                    "value": "4"
+                },
                 //{"name":"GST_DEBUG_FILE", "value": "/tmp/gst_debug.log"},
                 //{"name":"GST_DEBUG_NO_COLOR", "value": "0"},
                 //{"name":"GST_DEBUG_FILE", "value": "/tmp/gst_debug.log"},

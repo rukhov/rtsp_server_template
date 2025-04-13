@@ -4,20 +4,25 @@
 #endif
 
 #include <gst/gst.h>
+#include <gst/gstvalue.h>
 #include <gst/base/gstpushsrc.h>
-#include <gst/video/gstvideometa.h>
 #include <gst/video/gstvideopool.h>
 
 #include "GstColorBarsVideoSrc.h"
 #include "gst-color-bars.h"
 
-GST_DEBUG_CATEGORY_STATIC(gst_gst_color_bars_video_src_debug);
-#define GST_CAT_DEFAULT gst_gst_color_bars_video_src_debug
+constexpr int MAX_SUPPORTED_WIDTH = 1920;
+constexpr int MAX_SUPPORTED_HEIGHT = 1080;
+constexpr double MAX_SUPPORTED_FRAMERATE = 320.0;
+
+GST_DEBUG_CATEGORY_STATIC(gst_color_bars_video_src_debug);
+#define GST_CAT_DEFAULT gst_color_bars_video_src_debug
 
 template <typename... _Args>
 inline void log(std::format_string<_Args...> __fmt, _Args &&...__args)
 {
-    std::cout << ">>>>>>>> " << std::vformat(__fmt.get(), std::make_format_args(__args...));
+    g_log("GST_COLOR_BARS", GLogLevelFlags::G_LOG_LEVEL_MESSAGE, "%s", std::vformat(__fmt.get(), std::make_format_args(__args...)).c_str());
+    // g_print(">>>>>>>>>>>: %s", std::vformat(__fmt.get(), std::make_format_args(__args...)).c_str());
 }
 
 /* Filter signals and args */
@@ -33,29 +38,31 @@ enum
     PROP_SILENT
 };
 
-#define BAYER_CAPS_GEN(mask, bits, endian) \
-    " " #mask #bits #endian
+#define _VIDEO_FORMATS_STR "A444_16LE, A444_16BE, AYUV64, RGBA64_LE, "                                  \
+                           "ARGB64, ARGB64_LE, BGRA64_LE, ABGR64_LE, RGBA64_BE, ARGB64_BE, BGRA64_BE, " \
+                           "ABGR64_BE, A422_16LE, A422_16BE, A420_16LE, A420_16BE, A444_12LE, "         \
+                           "GBRA_12LE, A444_12BE, GBRA_12BE, Y412_LE, Y412_BE, A422_12LE, A422_12BE, "  \
+                           "A420_12LE, A420_12BE, A444_10LE, GBRA_10LE, A444_10BE, GBRA_10BE, "         \
+                           "A422_10LE, A422_10BE, A420_10LE, A420_10BE, BGR10A2_LE, RGB10A2_LE, Y410, " \
+                           "A444, GBRA, AYUV, VUYA, RGBA, RBGA, ARGB, BGRA, ABGR, A422, A420, AV12, "   \
+                           "Y444_16LE, GBR_16LE, Y444_16BE, GBR_16BE, v216, P016_LE, P016_BE, "         \
+                           "Y444_12LE, GBR_12LE, Y444_12BE, GBR_12BE, I422_12LE, I422_12BE, Y212_LE, "  \
+                           "Y212_BE, I420_12LE, I420_12BE, P012_LE, P012_BE, Y444_10LE, GBR_10LE, "     \
+                           "Y444_10BE, GBR_10BE, r210, I422_10LE, I422_10BE, NV16_10LE32, Y210, UYVP, " \
+                           "v210, I420_10LE, I420_10BE, P010_10LE, NV12_10LE40, NV12_10LE32, "          \
+                           "P010_10BE, MT2110R, MT2110T, NV12_10BE_8L128, NV12_10LE40_4L4, Y444, "      \
+                           "BGRP, GBR, RGBP, NV24, v308, IYU2, RGBx, xRGB, BGRx, xBGR, RGB, BGR, "      \
+                           "Y42B, NV16, NV61, YUY2, YVYU, UYVY, VYUY, I420, YV12, NV12, NV21, "         \
+                           "NV12_16L32S, NV12_32L32, NV12_4L4, NV12_64Z32, NV12_8L128, Y41B, IYU1, "    \
+                           "YUV9, YVU9, BGR16, RGB16, BGR15, RGB15, RGB8P, GRAY16_LE, GRAY16_BE, "      \
+                           "GRAY10_LE32, GRAY8"
 
-#define BAYER_CAPS_ORD(bits, endian)   \
-    BAYER_CAPS_GEN(bggr, bits, endian) \
-    "," BAYER_CAPS_GEN(rggb, bits, endian) "," BAYER_CAPS_GEN(grbg, bits, endian) "," BAYER_CAPS_GEN(gbrg, bits, endian)
+#define VIDEO_FORMATS_STR "I420, RGB"
 
-#define BAYER_CAPS_BITS(bits) \
-    BAYER_CAPS_ORD(bits, le)  \
-    "," BAYER_CAPS_ORD(bits, be)
+#define VIDEO_FORMATS_ALL "{ " VIDEO_FORMATS_STR " }"
 
-#define BAYER_CAPS_ALL \
-    BAYER_CAPS_ORD(, ) \
-    "," BAYER_CAPS_BITS(10) "," BAYER_CAPS_BITS(12) "," BAYER_CAPS_BITS(14) "," BAYER_CAPS_BITS(16)
-
-#define VTS_VIDEO_CAPS GST_VIDEO_CAPS_MAKE(GST_VIDEO_FORMATS_ALL) ","                                                     \
-                                                                  "multiview-mode = { mono, left, right }"                \
-                                                                  ";"                                                     \
-                                                                  "video/x-bayer, format=(string) {" BAYER_CAPS_ALL " }," \
-                                                                  "width = " GST_VIDEO_SIZE_RANGE ", "                    \
-                                                                  "height = " GST_VIDEO_SIZE_RANGE ", "                   \
-                                                                  "framerate = " GST_VIDEO_FPS_RANGE ", "                 \
-                                                                  "multiview-mode = { mono, left, right }"
+#define VTS_VIDEO_CAPS GST_VIDEO_CAPS_MAKE(VIDEO_FORMATS_ALL) "," \
+                                                              "width=640,height=480,framerate=25/1"
 
 /* the capabilities of the inputs and outputs.
  *
@@ -91,7 +98,7 @@ static gboolean
 gst_color_bars_video_src_sink_event(GstPad *pad, GstObject *parent,
                                     GstEvent *event)
 {
-    log("GstColorBarsVideoSrc::_sink_event\n");
+    log("GstColorBarsVideoSrc::_sink_event");
     GstColorBarsVideoSrc *filter;
     gboolean ret;
 
@@ -126,13 +133,13 @@ gst_color_bars_video_src_sink_event(GstPad *pad, GstObject *parent,
 static GstFlowReturn
 gst_color_bars_video_src_chain(GstPad *pad, GstObject *parent, GstBuffer *buf)
 {
-    log("GstColorBarsVideoSrc::_chain\n");
+    log("GstColorBarsVideoSrc::_chain");
     GstColorBarsVideoSrc *filter;
 
     filter = GST_GSTCOLORBARSVIDEOSRC(parent);
 
     if (filter->silent == FALSE)
-        g_print("I'm plugged, therefore I'm in.\n");
+        log("I'm plugged, therefore I'm in.");
 
     /* just push out the incoming buffer without touching it */
     return gst_pad_push(filter->srcpad, buf);
@@ -153,7 +160,7 @@ GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
 
 void _GstColorBarsVideoSrc::set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
 {
-    log("GstColorBarsVideoSrc::_set_property\n");
+    log("GstColorBarsVideoSrc::_set_property");
     GstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC(object);
 
     switch (prop_id)
@@ -169,7 +176,7 @@ void _GstColorBarsVideoSrc::set_property(GObject *object, guint prop_id, const G
 
 void _GstColorBarsVideoSrc::get_property(GObject *object, guint prop_id, GValue *value, GParamSpec *pspec)
 {
-    log("GstColorBarsVideoSrc::_get_property\n");
+    log("GstColorBarsVideoSrc::_get_property");
     GstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC(object);
 
     switch (prop_id)
@@ -185,7 +192,7 @@ void _GstColorBarsVideoSrc::get_property(GObject *object, guint prop_id, GValue 
 
 void _GstColorBarsVideoSrc::finalize(GObject *object)
 {
-    log("GstColorBarsVideoSrc::_finalize\n");
+    log("GstColorBarsVideoSrc::_finalize");
     GstColorBarsVideoSrc *filter = GST_GSTCOLORBARSVIDEOSRC(object);
     delete filter->color_bars;
     filter->color_bars = nullptr;
@@ -195,7 +202,7 @@ void _GstColorBarsVideoSrc::finalize(GObject *object)
 void gst_color_bars_video_src_register()
 {
     // GST_TYPE_GSTCOLORBARSVIDEOSRC;
-    log("GstColorBarsVideoSrc::_register\n");
+    log("GstColorBarsVideoSrc::_register");
 
     gboolean res = gst_element_register(NULL, "gst_color_bars_video_src", GST_RANK_NONE, GST_TYPE_GSTCOLORBARSVIDEOSRC);
 }
@@ -204,7 +211,7 @@ void gst_color_bars_video_src_register()
 static void
 gst_color_bars_video_src_class_init(GstColorBarsVideoSrcClass *klass)
 {
-    log("GstColorBarsVideoSrc::class_init\n");
+    log("GstColorBarsVideoSrc::class_init");
 
     G_TYPE_CHECK_CLASS_CAST(klass, GST_TYPE_GSTCOLORBARSVIDEOSRC, GstColorBarsVideoSrc);
 
@@ -239,7 +246,7 @@ gst_color_bars_video_src_class_init(GstColorBarsVideoSrcClass *klass)
  */
 static void gst_color_bars_video_src_init(GstColorBarsVideoSrc *source)
 {
-    log("GstColorBarsVideoSrc::_init\n");
+    log("GstColorBarsVideoSrc::_init");
 
     // source->srcpad = gst_pad_new_from_static_template (&src_factory, "src");
     // GST_PAD_SET_PROXY_CAPS (source->srcpad);
@@ -253,20 +260,34 @@ static void gst_color_bars_video_src_init(GstColorBarsVideoSrc *source)
 
     // auto clock = gst_element_get_clock(element);
     // auto clickId = gst_clock_new_periodic_id(clock, 0, 500 * 1000000);
+
+    /* Configure basesrc to operate in push mode */
+    gst_base_src_set_format(GST_BASE_SRC(source), GST_FORMAT_TIME);
+    gst_base_src_set_live(GST_BASE_SRC(source), FALSE);
+    gst_base_src_set_async(GST_BASE_SRC(source), FALSE);
+
+    GstState state;
+    GstState pending;
+
+    auto retSCh =
+        gst_element_get_state(&source->element.parent.element,
+                              &state,
+                              &pending,
+                              GST_CLOCK_TIME_NONE);
 }
 
 gboolean _GstColorBarsVideoSrc::_start(GstBaseSrc *object)
 {
-    log("GstColorBarsVideoSrc::_start\n");
+    log("GstColorBarsVideoSrc::_start");
 
     GstColorBarsVideoSrc *self = GST_GSTCOLORBARSVIDEOSRC(object);
-    // ... your implementation ...
+
     return TRUE; // Return TRUE on success, FALSE on failure
 }
 
 GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc *src, GstBuffer **buf)
 {
-    log("UNIMPLEMENTED: GstColorBarsVideoSrc::create\n");
+    log("UNIMPLEMENTED: GstColorBarsVideoSrc::create");
 
     auto self = GST_GSTCOLORBARSVIDEOSRC(src);
 
@@ -276,7 +297,11 @@ GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc *src, GstBuffer **buf)
         return GST_FLOW_EOS;
     }
 
-    guint bpp = 0;
+    gsize y_size = self->_video_info.width * self->_video_info.height;
+    gsize u_size = y_size / 4;
+    gsize v_size = y_size / 4;
+    gsize frame_size = y_size + u_size + v_size;
+
     /*
     if (g_strcmp0(self->format_string, "RGB") == 0) {
       bpp = 3;
@@ -288,7 +313,6 @@ GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc *src, GstBuffer **buf)
     }
       */
 
-    gsize frame_size = 640 * 480 * 4; // self->frame_width * self->frame_height * bpp;
     /*
     if (self->buffer_size - self->current_offset < frame_size) {
       GST_WARNING_OBJECT(self, "Not enough data in buffer for a full frame");
@@ -336,40 +360,75 @@ GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc *src, GstBuffer **buf)
     {
         gst_buffer_unref(buffer);
         GST_ERROR_OBJECT(self, "Failed to map buffer for writing");
+        log("Failed to map buffer for writing");
         return GST_FLOW_ERROR;
     }
 
+    GST_BUFFER_PTS(buffer) = gst_util_uint64_scale(self->_frames_sent, GST_SECOND * self->_video_info.fps_d, self->_video_info.fps_n); // Assuming 30 FPS
+    GST_BUFFER_DURATION(buffer) = gst_util_uint64_scale(1, GST_SECOND * self->_video_info.fps_d, self->_video_info.fps_n);
+    GST_BUFFER_OFFSET(buffer) = GST_BUFFER_PTS(buffer);
+    GST_BUFFER_OFFSET_END(buffer) = GST_BUFFER_PTS(buffer) + GST_BUFFER_DURATION(buffer);
+
     *buf = buffer;
-    GST_BUFFER_PTS(buffer) = gst_util_uint64_scale(self->frames_sent, GST_SECOND, 30); // Assuming 30 FPS
 
     return GST_FLOW_OK;
 }
 
+std::string Caps2String(GstCaps &caps)
+{
+    auto pchar = gst_caps_serialize(&caps, GstSerializeFlags::GST_SERIALIZE_FLAG_NONE);
+    std::string str(pchar);
+    g_free(pchar);
+    return str;
+}
+
 gboolean _GstColorBarsVideoSrc::setcaps(GstBaseSrc *bsrc, GstCaps *caps)
 {
+    auto caps_str = Caps2String(*caps);
+    log("GstColorBarsVideoSrc::setcaps");
+    log("Proposed caps: {}\n", caps_str);
 
-    log("GstColorBarsVideoSrc::setcaps\n");
-
+    gboolean ret = TRUE;
     GstVideoInfo info;
-    const GstStructure *structure;
     auto self = GST_GSTCOLORBARSVIDEOSRC(bsrc);
 
-    structure = gst_caps_get_structure(caps, 0);
+    for (guint i = 0; i < gst_caps_get_size(caps); ++i)
+    {
+        auto structure = gst_caps_get_structure(caps, i);
+        const gchar *name = gst_structure_get_name(structure);
 
-    if (gst_structure_has_name(structure, "video/x-raw"))
-    {
-        /* we can use the parsing code */
-        if (!gst_video_info_from_caps(&info, caps))
-            return FALSE;
-    }
-    else if (gst_structure_has_name(structure, "video/x-bayer"))
-    {
-        // if (!gst_video_test_src_parse_caps (caps, &info, videotestsrc)) return FALSE;
-    }
-    else
-    {
-        return FALSE;
+        log("Caps structure {}: {}", i, gst_structure_to_string(structure));
+
+        if (gst_structure_has_name(structure, "video/x-raw"))
+        {
+            /* we can use the parsing code */
+            if (!gst_video_info_from_caps(&info, caps))
+            {
+                log("Failed to parse video info from caps");
+                ret = FALSE;
+                continue;
+            }
+
+            self->_video_info = info;
+        }
+        else if (gst_structure_has_name(structure, "video/x-bayer"))
+        {
+            log("Unsupported Bayer format");
+            ret = FALSE;
+            continue;
+        }
+        else
+        {
+            ret = FALSE;
+            continue;
+        }
     }
 
-    return TRUE;
+    // If you found a compatible format, store the negotiated caps
+    if (ret)
+    {
+        self->_negotiated_caps = caps_str;
+    }
+
+    return ret;
 }
