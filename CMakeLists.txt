@@ -53,6 +53,6 @@ target_sources(${TARGET} PRIVATE
     #main-x264.cpp
     #testH264VideoStreamer.cpp
     main-gstream.cpp
-    gst-color-bars.cpp
+    picture_gen.cpp
     GstColorBarsVideoSrc.cpp
 )
