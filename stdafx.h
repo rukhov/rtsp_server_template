@@ -7,3 +7,5 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#include <gst/gst.h>

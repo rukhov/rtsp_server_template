@@ -35,28 +35,6 @@ enum {
     LAST_SIGNAL
 };
 
-enum { PROP_0, PROP_SILENT };
-
-#define _VIDEO_FORMATS_STR                                                       \
-    "A444_16LE, A444_16BE, AYUV64, RGBA64_LE, "                                  \
-    "ARGB64, ARGB64_LE, BGRA64_LE, ABGR64_LE, RGBA64_BE, ARGB64_BE, BGRA64_BE, " \
-    "ABGR64_BE, A422_16LE, A422_16BE, A420_16LE, A420_16BE, A444_12LE, "         \
-    "GBRA_12LE, A444_12BE, GBRA_12BE, Y412_LE, Y412_BE, A422_12LE, A422_12BE, "  \
-    "A420_12LE, A420_12BE, A444_10LE, GBRA_10LE, A444_10BE, GBRA_10BE, "         \
-    "A422_10LE, A422_10BE, A420_10LE, A420_10BE, BGR10A2_LE, RGB10A2_LE, Y410, " \
-    "A444, GBRA, AYUV, VUYA, RGBA, RBGA, ARGB, BGRA, ABGR, A422, A420, AV12, "   \
-    "Y444_16LE, GBR_16LE, Y444_16BE, GBR_16BE, v216, P016_LE, P016_BE, "         \
-    "Y444_12LE, GBR_12LE, Y444_12BE, GBR_12BE, I422_12LE, I422_12BE, Y212_LE, "  \
-    "Y212_BE, I420_12LE, I420_12BE, P012_LE, P012_BE, Y444_10LE, GBR_10LE, "     \
-    "Y444_10BE, GBR_10BE, r210, I422_10LE, I422_10BE, NV16_10LE32, Y210, UYVP, " \
-    "v210, I420_10LE, I420_10BE, P010_10LE, NV12_10LE40, NV12_10LE32, "          \
-    "P010_10BE, MT2110R, MT2110T, NV12_10BE_8L128, NV12_10LE40_4L4, Y444, "      \
-    "BGRP, GBR, RGBP, NV24, v308, IYU2, RGBx, xRGB, BGRx, xBGR, RGB, BGR, "      \
-    "Y42B, NV16, NV61, YUY2, YVYU, UYVY, VYUY, I420, YV12, NV12, NV21, "         \
-    "NV12_16L32S, NV12_32L32, NV12_4L4, NV12_64Z32, NV12_8L128, Y41B, IYU1, "    \
-    "YUV9, YVU9, BGR16, RGB16, BGR15, RGB15, RGB8P, GRAY16_LE, GRAY16_BE, "      \
-    "GRAY10_LE32, GRAY8"
-
 #define VIDEO_FORMATS_STR "I420, RGB"
 
 #define VIDEO_FORMATS_ALL "{ " VIDEO_FORMATS_STR " }"
@@ -104,7 +82,6 @@ gst_color_bars_video_src_chain(GstPad* pad, GstObject* parent, GstBuffer* buf);
 static gboolean
 gst_color_bars_video_src_sink_event(GstPad* pad, GstObject* parent, GstEvent* event)
 {
-    log("GstColorBarsVideoSrc::_sink_event");
     GstColorBarsVideoSrc* filter;
     gboolean ret;
 
@@ -137,44 +114,22 @@ gst_color_bars_video_src_sink_event(GstPad* pad, GstObject* parent, GstEvent* ev
 static GstFlowReturn
 gst_color_bars_video_src_chain(GstPad* pad, GstObject* parent, GstBuffer* buf)
 {
-    log("GstColorBarsVideoSrc::_chain");
     GstColorBarsVideoSrc* filter;
 
     filter = GST_GSTCOLORBARSVIDEOSRC(parent);
 
-    if (filter->silent == FALSE)
-        log("I'm plugged, therefore I'm in.");
-
     /* just push out the incoming buffer without touching it */
     return gst_pad_push(filter->srcpad, buf);
 }
-
-/* gstreamer looks for this structure to register gstcolorbarsvideosrcs
- *
- * exchange the string 'Template gstcolorbarsvideosrc' with your gstcolorbarsvideosrc
- * description
- */
-/*
-GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
-    GST_VERSION_MINOR,
-    gstcolorbarsvideosrc,
-    "gst_color_bars_video_src",
-    gstcolorbarsvideosrc_init,
-    PACKAGE_VERSION, GST_LICENSE, GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN)
-*/
 
 void _GstColorBarsVideoSrc::set_property(GObject* object,
                                          guint prop_id,
                                          const GValue* value,
                                          GParamSpec* pspec)
 {
-    log("GstColorBarsVideoSrc::_set_property");
     GstColorBarsVideoSrc* filter = GST_GSTCOLORBARSVIDEOSRC(object);
 
     switch (prop_id) {
-    case PROP_SILENT:
-        filter->silent = g_value_get_boolean(value);
-        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
         break;
@@ -186,13 +141,9 @@ void _GstColorBarsVideoSrc::get_property(GObject* object,
                                          GValue* value,
                                          GParamSpec* pspec)
 {
-    log("GstColorBarsVideoSrc::_get_property");
     GstColorBarsVideoSrc* filter = GST_GSTCOLORBARSVIDEOSRC(object);
 
     switch (prop_id) {
-    case PROP_SILENT:
-        g_value_set_boolean(value, filter->silent);
-        break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
         break;
@@ -201,7 +152,6 @@ void _GstColorBarsVideoSrc::get_property(GObject* object,
 
 void _GstColorBarsVideoSrc::finalize(GObject* object)
 {
-    log("GstColorBarsVideoSrc::_finalize");
     GstColorBarsVideoSrc* filter = GST_GSTCOLORBARSVIDEOSRC(object);
     delete filter->_picture_gen;
     filter->_picture_gen = nullptr;
@@ -210,9 +160,6 @@ void _GstColorBarsVideoSrc::finalize(GObject* object)
 
 void gst_color_bars_video_src_register()
 {
-    // GST_TYPE_GSTCOLORBARSVIDEOSRC;
-    log("GstColorBarsVideoSrc::_register");
-
     gboolean res = gst_element_register(
         NULL, "gst_color_bars_video_src", GST_RANK_NONE, GST_TYPE_GSTCOLORBARSVIDEOSRC);
 }
@@ -220,8 +167,6 @@ void gst_color_bars_video_src_register()
 /* initialize the gstcolorbarsvideosrc's class */
 static void gst_color_bars_video_src_class_init(GstColorBarsVideoSrcClass* klass)
 {
-    log("GstColorBarsVideoSrc::class_init");
-
     G_TYPE_CHECK_CLASS_CAST(klass, GST_TYPE_GSTCOLORBARSVIDEOSRC, GstColorBarsVideoSrc);
 
     auto gobject_class = G_OBJECT_CLASS(klass);
@@ -235,12 +180,6 @@ static void gst_color_bars_video_src_class_init(GstColorBarsVideoSrcClass* klass
     gstpushsrc_class->create = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::create);
     basesrc_class->start = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::_start);
     basesrc_class->set_caps = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::setcaps);
-
-    g_object_class_install_property(
-        gobject_class,
-        PROP_SILENT,
-        g_param_spec_boolean(
-            "silent", "Silent", "Produce verbose output ?", FALSE, G_PARAM_READWRITE));
 
     gst_element_class_set_details_simple(gstelement_class,
                                          "GstColorBarsVideoSrc",
@@ -258,18 +197,7 @@ static void gst_color_bars_video_src_class_init(GstColorBarsVideoSrcClass* klass
  */
 static void gst_color_bars_video_src_init(GstColorBarsVideoSrc* source)
 {
-    log("GstColorBarsVideoSrc::_init");
-
-    // source->srcpad = gst_pad_new_from_static_template (&src_factory, "src");
-    // GST_PAD_SET_PROXY_CAPS (source->srcpad);
-    // gst_element_add_pad (GST_ELEMENT (source), source->srcpad);
-
-    source->silent = FALSE;
-
     auto element = (GstElement*)source;
-
-    // auto clock = gst_element_get_clock(element);
-    // auto clickId = gst_clock_new_periodic_id(clock, 0, 500 * 1000000);
 
     /* Configure basesrc to operate in push mode */
     gst_base_src_set_format(GST_BASE_SRC(source), GST_FORMAT_TIME);
@@ -285,19 +213,15 @@ static void gst_color_bars_video_src_init(GstColorBarsVideoSrc* source)
 
 gboolean _GstColorBarsVideoSrc::_start(GstBaseSrc* object)
 {
-    log("GstColorBarsVideoSrc::_start");
-
     GstColorBarsVideoSrc* self = GST_GSTCOLORBARSVIDEOSRC(object);
 
     self->_next_frame = std::chrono::high_resolution_clock::now();
 
-    return TRUE; // Return TRUE on success, FALSE on failure
+    return TRUE;
 }
 
 GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc* src, GstBuffer** buf)
 {
-    // log("GstColorBarsVideoSrc::create");
-
     auto self = GST_GSTCOLORBARSVIDEOSRC(src);
 
     std::this_thread::sleep_until(self->_next_frame);
@@ -321,9 +245,10 @@ GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc* src, GstBuffer** buf)
         return GST_FLOW_ERROR;
     }
 
-    GST_BUFFER_PTS(buffer) = gst_util_uint64_scale(self->_frames_sent,
+    GST_BUFFER_PTS(buffer) = gst_util_uint64_scale(self->_frame_counter,
                                                    GST_SECOND * self->_video_info.fps_d,
                                                    self->_video_info.fps_n);
+    GST_BUFFER_DTS(buffer) = GST_CLOCK_TIME_NONE;
     GST_BUFFER_DURATION(buffer) = gst_util_uint64_scale(
         1, GST_SECOND * self->_video_info.fps_d, self->_video_info.fps_n);
     GST_BUFFER_OFFSET(buffer) = GST_BUFFER_PTS(buffer);
@@ -333,6 +258,8 @@ GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc* src, GstBuffer** buf)
 
     self->_next_frame += std::chrono::microseconds(1000000 * self->_video_info.fps_d /
                                                    self->_video_info.fps_n);
+
+    ++self->_frame_counter;
     return GST_FLOW_OK;
 }
 
@@ -347,9 +274,6 @@ std::string Caps2String(GstCaps& caps)
 gboolean _GstColorBarsVideoSrc::setcaps(GstBaseSrc* bsrc, GstCaps* caps)
 {
     auto caps_str = Caps2String(*caps);
-    log("GstColorBarsVideoSrc::setcaps");
-    log("Proposed caps: {}\n", caps_str);
-
     gboolean ret = TRUE;
     GstVideoInfo info;
     auto self = GST_GSTCOLORBARSVIDEOSRC(bsrc);
@@ -358,7 +282,7 @@ gboolean _GstColorBarsVideoSrc::setcaps(GstBaseSrc* bsrc, GstCaps* caps)
         auto structure = gst_caps_get_structure(caps, i);
         const gchar* name = gst_structure_get_name(structure);
 
-        log("Caps structure {}: {}", i, gst_structure_to_string(structure));
+        // log("Caps structure {}: {}", i, gst_structure_to_string(structure));
 
         if (gst_structure_has_name(structure, "video/x-raw")) {
             /* we can use the parsing code */

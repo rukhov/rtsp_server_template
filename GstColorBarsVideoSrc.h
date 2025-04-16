@@ -21,10 +21,8 @@ struct _GstColorBarsVideoSrc {
 
     std::string _negotiated_caps;
     GstVideoInfo _video_info;
-    gboolean silent;
-
     gst::PictureGen* _picture_gen;
-    size_t _frames_sent = 0;
+    size_t _frame_counter = 0;
     std::chrono::high_resolution_clock::time_point _next_frame;
 
     static void

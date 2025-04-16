@@ -40,20 +40,22 @@ int main(int argc, char* argv[])
      * any launch line works as long as it contains elements named pay%d. Each
      * element with pay%d names will be a stream */
     factory = gst_rtsp_media_factory_new();
-    /*
-    gst_rtsp_media_factory_set_launch(factory,
-                                      "( videotestsrc is-live=1 pattern=smpte ! "
-                                      "video/x-raw,format=RGB,framerate=25/1 ! "
-                                      "videoconvert ! video/x-raw,format=I420 ! x264enc "
-                                      "! rtph264pay name=pay0 pt=96 )");
-                                      */
 
-    gst_rtsp_media_factory_set_launch(
-        factory,
-        R"( gst_color_bars_video_src ! video/x-raw,width=320,height=240,format=RGB,
-                                      framerate=25/1 ! videoconvert ! video/x-raw,
-                                      format=I420 ! x264enc ! rtph264pay name=pay0 pt=96)");
+    if constexpr (0) {
 
+        gst_rtsp_media_factory_set_launch(
+            factory,
+            "( videotestsrc is-live=1 pattern=smpte ! "
+            "video/x-raw,width=640,height=480,framerate=30/1 "
+            "! x264enc key-int-max=30 tune=zerolatency ! h264parse "
+            "! rtph264pay config-interval=-1 pt=96 name=pay0 )");
+    } else {
+        gst_rtsp_media_factory_set_launch(
+            factory,
+            R"( gst_color_bars_video_src ! video/x-raw,width=640,height=480,framerate=25/1,format=RGB ! 
+                    videoconvert ! video/x-raw,format=I420 ! x264enc key-int-max=1 ! 
+                    rtph264pay pt=96 name=pay0)");
+    }
     //  gst_rtsp_media_factory_set_launch(factory, "( gst_color_bars_video_src !
     //  x264enc ! rtph264pay name=pay0 pt=96 )");
 

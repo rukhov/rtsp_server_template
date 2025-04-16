@@ -2,22 +2,13 @@
   "dependencies": [
     "boost",
     "gtest",
-    {
-      "name": "opencv4",
-      "features": [
-        "gstreamer"
-      ]
-    },
-    {
-      "name": "gstreamer",
-      "features": [
-      ]
-    },
-    "gst-rtsp-server",
-    "live555",
-    "x264"
+    "opencv4",
+    "gstreamer",
+    "gst-rtsp-server"
   ],
   "vcpkg-configuration": {
-    "overlay-ports": ["cmake/ports"]
+    "overlay-ports": [
+      "cmake/ports"
+    ]
   }
 }

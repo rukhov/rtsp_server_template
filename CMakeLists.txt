@@ -25,7 +25,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GStreamer REQUIRED gstreamer-1.0)
 pkg_check_modules(GstRtspServer REQUIRED gstreamer-rtsp-server-1.0)
 
-find_package(unofficial-live555 REQUIRED)
 find_package(OpenCV REQUIRED)
 
 set(TARGET rtsp_server_sample)
@@ -40,18 +39,12 @@ target_include_directories(${TARGET}
 )
 
 target_link_libraries(${TARGET} 
-    #PRIVATE opencv_core opencv_videoio opencv_highgui
-    #PRIVATE unofficial::liveMedia unofficial::groupsock unofficial::BasicUsageEnvironment unofficial::UsageEnvironment
-    #PRIVATE OpenSSL::SSL
-    #PRIVATE GStreamer::GStreamer GstRtspServer
-    PRIVATE /home/rukhov/projects/github/rtsp_server_sample/build/vcpkg_installed/x64-linux/lib/libx264.a
     PRIVATE ${GStreamer_LIBRARIES}
     PRIVATE ${GstRtspServer_LIBRARIES}
+    PRIVATE opencv_videoio opencv_imgcodecs opencv_imgproc
 )
 
 target_sources(${TARGET} PRIVATE
-    #main-x264.cpp
-    #testH264VideoStreamer.cpp
     main-gstream.cpp
     picture_gen.cpp
     GstColorBarsVideoSrc.cpp
