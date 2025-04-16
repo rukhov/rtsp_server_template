@@ -8,7 +8,6 @@ namespace gst {
 class PictureGen;
 }
 
-// G_BEGIN_DECLS
 
 #define GST_TYPE_GSTCUSTOMVIDEOSRC (gst_custom_video_src_get_type())
 
@@ -38,6 +37,5 @@ struct _GstCustomVideoSrc {
 
 void gst_custom_video_src_register();
 
-// G_END_DECLS
 
 #endif /* __GST_GSTCUSTOMVIDEOSRC_H__ */

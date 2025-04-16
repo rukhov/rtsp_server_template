@@ -6,12 +6,10 @@
 #include "GstCustomVideoSrc.h"
 
 #define DEFAULT_RTSP_PORT "8554"
-#define DEFAULT_MOUNT_POINT "/test"
-#define DEFAULT_H264_FILE "test.h264"
+#define DEFAULT_MOUNT_POINT "/custom_video_src"
 
 static char* port = (char*)DEFAULT_RTSP_PORT;
 static char* mount_point = (char*)DEFAULT_MOUNT_POINT;
-static char* file_location = (char*)DEFAULT_H264_FILE;
 
 int main(int argc, char* argv[])
 {
@@ -42,7 +40,7 @@ int main(int argc, char* argv[])
     factory = gst_rtsp_media_factory_new();
 
     if constexpr (0) {
-
+        // For testing purposes
         gst_rtsp_media_factory_set_launch(
             factory,
             "( videotestsrc is-live=1 pattern=smpte ! "
@@ -62,7 +60,7 @@ int main(int argc, char* argv[])
     gst_rtsp_media_factory_set_shared(factory, TRUE);
 
     /* attach the test factory to the /test url */
-    gst_rtsp_mount_points_add_factory(mounts, "/custom_video_src", factory);
+    gst_rtsp_mount_points_add_factory(mounts, mount_point, factory);
 
     /* don't need the ref to the mapper anymore */
     g_object_unref(mounts);
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
     gst_rtsp_server_attach(server, NULL);
 
     /* start serving */
-    g_print("stream ready at rtsp://127.0.0.1:8554/custom_video_src\n");
+    g_print("stream ready at rtsp://127.0.0.1:%s%s\n", port, mount_point);
     g_main_loop_run(loop);
 
     return 0;
