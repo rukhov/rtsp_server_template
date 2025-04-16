@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "GstColorBarsVideoSrc.h"
+#include "GstCustomVideoSrc.h"
 
 #define DEFAULT_RTSP_PORT "8554"
 #define DEFAULT_MOUNT_POINT "/test"
@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 
     gst_init(&argc, &argv);
 
-    gst_color_bars_video_src_register();
+    gst_custom_video_src_register();
 
     loop = g_main_loop_new(NULL, FALSE);
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
     } else {
         gst_rtsp_media_factory_set_launch(
             factory,
-            R"( gst_color_bars_video_src ! video/x-raw,width=640,height=480,framerate=25/1,format=RGB ! 
+            R"( gst_custom_video_src ! video/x-raw,width=640,height=480,framerate=25/1,format=RGB ! 
                     videoconvert ! video/x-raw,format=I420 ! x264enc key-int-max=1 ! 
                     rtph264pay pt=96 name=pay0)");
     }
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     gst_rtsp_media_factory_set_shared(factory, TRUE);
 
     /* attach the test factory to the /test url */
-    gst_rtsp_mount_points_add_factory(mounts, "/test", factory);
+    gst_rtsp_mount_points_add_factory(mounts, "/custom_video_src", factory);
 
     /* don't need the ref to the mapper anymore */
     g_object_unref(mounts);
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
     gst_rtsp_server_attach(server, NULL);
 
     /* start serving */
-    g_print("stream ready at rtsp://127.0.0.1:8554/test\n");
+    g_print("stream ready at rtsp://127.0.0.1:8554/custom_video_src\n");
     g_main_loop_run(loop);
 
     return 0;

@@ -8,32 +8,20 @@
 #include <gst/gstvalue.h>
 #include <gst/video/gstvideopool.h>
 
-#include "GstColorBarsVideoSrc.h"
+#include "GstCustomVideoSrc.h"
 #include "picture_gen.h"
 
-constexpr int MAX_SUPPORTED_WIDTH = 1920;
-constexpr int MAX_SUPPORTED_HEIGHT = 1080;
-constexpr double MAX_SUPPORTED_FRAMERATE = 320.0;
-
-GST_DEBUG_CATEGORY_STATIC(gst_color_bars_video_src_debug);
-#define GST_CAT_DEFAULT gst_color_bars_video_src_debug
+GST_DEBUG_CATEGORY_STATIC(gst_custom_video_src_debug);
+#define GST_CAT_DEFAULT gst_custom_video_src_debug
 
 template <typename... _Args>
 inline void log(std::format_string<_Args...> __fmt, _Args&&... __args)
 {
-    g_log("GST_COLOR_BARS",
+    g_log("CUSTOM_VIDEO_SRC",
           GLogLevelFlags::G_LOG_LEVEL_MESSAGE,
           "%s",
           std::vformat(__fmt.get(), std::make_format_args(__args...)).c_str());
-    // g_print(">>>>>>>>>>>: %s", std::vformat(__fmt.get(),
-    // std::make_format_args(__args...)).c_str());
 }
-
-/* Filter signals and args */
-enum {
-    /* FILL ME */
-    LAST_SIGNAL
-};
 
 #define VIDEO_FORMATS_STR "I420, RGB"
 
@@ -52,27 +40,28 @@ enum {
 static GstStaticPadTemplate src_factory = GST_STATIC_PAD_TEMPLATE(
     "src", GST_PAD_SRC, GST_PAD_ALWAYS, GST_STATIC_CAPS(VTS_VIDEO_CAPS));
 
-#define gst_color_bars_video_src_parent_class parent_class
-G_DEFINE_TYPE(GstColorBarsVideoSrc, gst_color_bars_video_src, GST_TYPE_PUSH_SRC);
+#define gst_custom_video_src_parent_class parent_class
 
-GST_ELEMENT_REGISTER_DEFINE(gst_color_bars_video_src,
-                            "gst_color_bars_video_src",
+G_DEFINE_TYPE(GstCustomVideoSrc, gst_custom_video_src, GST_TYPE_PUSH_SRC);
+
+GST_ELEMENT_REGISTER_DEFINE(gst_custom_video_src,
+                            "gst_custom_video_src",
                             GST_RANK_NONE,
-                            GST_TYPE_GSTCOLORBARSVIDEOSRC);
+                            GST_TYPE_GSTCUSTOMVIDEOSRC);
 
-static void gst_color_bars_video_src_set_property(GObject* object,
-                                                  guint prop_id,
-                                                  const GValue* value,
-                                                  GParamSpec* pspec);
-static void gst_color_bars_video_src_get_property(GObject* object,
-                                                  guint prop_id,
-                                                  GValue* value,
-                                                  GParamSpec* pspec);
+static void gst_custom_video_src_set_property(GObject* object,
+                                              guint prop_id,
+                                              const GValue* value,
+                                              GParamSpec* pspec);
+static void gst_custom_video_src_get_property(GObject* object,
+                                              guint prop_id,
+                                              GValue* value,
+                                              GParamSpec* pspec);
 
 static gboolean
-gst_color_bars_video_src_sink_event(GstPad* pad, GstObject* parent, GstEvent* event);
+gst_custom_video_src_sink_event(GstPad* pad, GstObject* parent, GstEvent* event);
 static GstFlowReturn
-gst_color_bars_video_src_chain(GstPad* pad, GstObject* parent, GstBuffer* buf);
+gst_custom_video_src_chain(GstPad* pad, GstObject* parent, GstBuffer* buf);
 
 /* GObject vmethod implementations */
 
@@ -80,12 +69,12 @@ gst_color_bars_video_src_chain(GstPad* pad, GstObject* parent, GstBuffer* buf);
 
 /* this function handles sink events */
 static gboolean
-gst_color_bars_video_src_sink_event(GstPad* pad, GstObject* parent, GstEvent* event)
+gst_custom_video_src_sink_event(GstPad* pad, GstObject* parent, GstEvent* event)
 {
-    GstColorBarsVideoSrc* filter;
+    GstCustomVideoSrc* filter;
     gboolean ret;
 
-    filter = GST_GSTCOLORBARSVIDEOSRC(parent);
+    filter = GST_CUSTOMVIDEOSRC(parent);
 
     GST_LOG_OBJECT(
         filter, "Received %s event: %" GST_PTR_FORMAT, GST_EVENT_TYPE_NAME(event), event);
@@ -112,22 +101,22 @@ gst_color_bars_video_src_sink_event(GstPad* pad, GstObject* parent, GstEvent* ev
  * this function does the actual processing
  */
 static GstFlowReturn
-gst_color_bars_video_src_chain(GstPad* pad, GstObject* parent, GstBuffer* buf)
+gst_custom_video_src_chain(GstPad* pad, GstObject* parent, GstBuffer* buf)
 {
-    GstColorBarsVideoSrc* filter;
+    GstCustomVideoSrc* filter;
 
-    filter = GST_GSTCOLORBARSVIDEOSRC(parent);
+    filter = GST_CUSTOMVIDEOSRC(parent);
 
     /* just push out the incoming buffer without touching it */
     return gst_pad_push(filter->srcpad, buf);
 }
 
-void _GstColorBarsVideoSrc::set_property(GObject* object,
-                                         guint prop_id,
-                                         const GValue* value,
-                                         GParamSpec* pspec)
+void _GstCustomVideoSrc::set_property(GObject* object,
+                                      guint prop_id,
+                                      const GValue* value,
+                                      GParamSpec* pspec)
 {
-    GstColorBarsVideoSrc* filter = GST_GSTCOLORBARSVIDEOSRC(object);
+    GstCustomVideoSrc* filter = GST_CUSTOMVIDEOSRC(object);
 
     switch (prop_id) {
     default:
@@ -136,12 +125,12 @@ void _GstColorBarsVideoSrc::set_property(GObject* object,
     }
 }
 
-void _GstColorBarsVideoSrc::get_property(GObject* object,
-                                         guint prop_id,
-                                         GValue* value,
-                                         GParamSpec* pspec)
+void _GstCustomVideoSrc::get_property(GObject* object,
+                                      guint prop_id,
+                                      GValue* value,
+                                      GParamSpec* pspec)
 {
-    GstColorBarsVideoSrc* filter = GST_GSTCOLORBARSVIDEOSRC(object);
+    GstCustomVideoSrc* filter = GST_CUSTOMVIDEOSRC(object);
 
     switch (prop_id) {
     default:
@@ -150,39 +139,39 @@ void _GstColorBarsVideoSrc::get_property(GObject* object,
     }
 }
 
-void _GstColorBarsVideoSrc::finalize(GObject* object)
+void _GstCustomVideoSrc::finalize(GObject* object)
 {
-    GstColorBarsVideoSrc* filter = GST_GSTCOLORBARSVIDEOSRC(object);
+    GstCustomVideoSrc* filter = GST_CUSTOMVIDEOSRC(object);
     delete filter->_picture_gen;
     filter->_picture_gen = nullptr;
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-void gst_color_bars_video_src_register()
+void gst_custom_video_src_register()
 {
     gboolean res = gst_element_register(
-        NULL, "gst_color_bars_video_src", GST_RANK_NONE, GST_TYPE_GSTCOLORBARSVIDEOSRC);
+        NULL, "gst_custom_video_src", GST_RANK_NONE, GST_TYPE_GSTCUSTOMVIDEOSRC);
 }
 
 /* initialize the gstcolorbarsvideosrc's class */
-static void gst_color_bars_video_src_class_init(GstColorBarsVideoSrcClass* klass)
+static void gst_custom_video_src_class_init(GstCustomVideoSrcClass* klass)
 {
-    G_TYPE_CHECK_CLASS_CAST(klass, GST_TYPE_GSTCOLORBARSVIDEOSRC, GstColorBarsVideoSrc);
+    G_TYPE_CHECK_CLASS_CAST(klass, GST_TYPE_GSTCUSTOMVIDEOSRC, GstCustomVideoSrc);
 
     auto gobject_class = G_OBJECT_CLASS(klass);
     auto gstelement_class = GST_ELEMENT_CLASS(klass);
     auto gstpushsrc_class = GST_PUSH_SRC_CLASS(klass);
     auto basesrc_class = GST_BASE_SRC_CLASS(klass);
 
-    gobject_class->set_property = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::set_property);
-    gobject_class->get_property = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::get_property);
-    gobject_class->finalize = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::finalize);
-    gstpushsrc_class->create = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::create);
-    basesrc_class->start = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::_start);
-    basesrc_class->set_caps = GST_DEBUG_FUNCPTR(_GstColorBarsVideoSrc::setcaps);
+    gobject_class->set_property = GST_DEBUG_FUNCPTR(_GstCustomVideoSrc::set_property);
+    gobject_class->get_property = GST_DEBUG_FUNCPTR(_GstCustomVideoSrc::get_property);
+    gobject_class->finalize = GST_DEBUG_FUNCPTR(_GstCustomVideoSrc::finalize);
+    gstpushsrc_class->create = GST_DEBUG_FUNCPTR(_GstCustomVideoSrc::create);
+    basesrc_class->start = GST_DEBUG_FUNCPTR(_GstCustomVideoSrc::_start);
+    basesrc_class->set_caps = GST_DEBUG_FUNCPTR(_GstCustomVideoSrc::setcaps);
 
     gst_element_class_set_details_simple(gstelement_class,
-                                         "GstColorBarsVideoSrc",
+                                         "GstCustomVideoSrc",
                                          "source",
                                          "In memory Video Buffer Test Source",
                                          "Roman Ukhov ukhov.roman@gmail.com>>");
@@ -195,7 +184,7 @@ static void gst_color_bars_video_src_class_init(GstColorBarsVideoSrcClass* klass
  * set pad callback functions
  * initialize instance structure
  */
-static void gst_color_bars_video_src_init(GstColorBarsVideoSrc* source)
+static void gst_custom_video_src_init(GstCustomVideoSrc* source)
 {
     auto element = (GstElement*)source;
 
@@ -211,18 +200,18 @@ static void gst_color_bars_video_src_init(GstColorBarsVideoSrc* source)
         &source->element.parent.element, &state, &pending, GST_CLOCK_TIME_NONE);
 }
 
-gboolean _GstColorBarsVideoSrc::_start(GstBaseSrc* object)
+gboolean _GstCustomVideoSrc::_start(GstBaseSrc* object)
 {
-    GstColorBarsVideoSrc* self = GST_GSTCOLORBARSVIDEOSRC(object);
+    GstCustomVideoSrc* self = GST_CUSTOMVIDEOSRC(object);
 
     self->_next_frame = std::chrono::high_resolution_clock::now();
 
     return TRUE;
 }
 
-GstFlowReturn _GstColorBarsVideoSrc::create(GstPushSrc* src, GstBuffer** buf)
+GstFlowReturn _GstCustomVideoSrc::create(GstPushSrc* src, GstBuffer** buf)
 {
-    auto self = GST_GSTCOLORBARSVIDEOSRC(src);
+    auto self = GST_CUSTOMVIDEOSRC(src);
 
     std::this_thread::sleep_until(self->_next_frame);
 
@@ -271,12 +260,12 @@ std::string Caps2String(GstCaps& caps)
     return str;
 }
 
-gboolean _GstColorBarsVideoSrc::setcaps(GstBaseSrc* bsrc, GstCaps* caps)
+gboolean _GstCustomVideoSrc::setcaps(GstBaseSrc* bsrc, GstCaps* caps)
 {
     auto caps_str = Caps2String(*caps);
     gboolean ret = TRUE;
     GstVideoInfo info;
-    auto self = GST_GSTCOLORBARSVIDEOSRC(bsrc);
+    auto self = GST_CUSTOMVIDEOSRC(bsrc);
 
     for (guint i = 0; i < gst_caps_get_size(caps); ++i) {
         auto structure = gst_caps_get_structure(caps, i);

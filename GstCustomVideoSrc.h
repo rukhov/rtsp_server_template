@@ -1,5 +1,5 @@
-#ifndef __GST_GSTCOLORBARSVIDEOSRC_H__
-#define __GST_GSTCOLORBARSVIDEOSRC_H__
+#ifndef __GST_GSTCUSTOMVIDEOSRC_H__
+#define __GST_GSTCUSTOMVIDEOSRC_H__
 
 #include <gst/gst.h>
 #include <gst/video/gstvideometa.h>
@@ -10,11 +10,12 @@ class PictureGen;
 
 // G_BEGIN_DECLS
 
-#define GST_TYPE_GSTCOLORBARSVIDEOSRC (gst_color_bars_video_src_get_type())
-G_DECLARE_FINAL_TYPE(
-    GstColorBarsVideoSrc, gst_color_bars_video_src, GST, GSTCOLORBARSVIDEOSRC, GstPushSrc)
+#define GST_TYPE_GSTCUSTOMVIDEOSRC (gst_custom_video_src_get_type())
 
-struct _GstColorBarsVideoSrc {
+G_DECLARE_FINAL_TYPE(
+    GstCustomVideoSrc, gst_custom_video_src, GST, CUSTOMVIDEOSRC, GstPushSrc)
+
+struct _GstCustomVideoSrc {
     GstPushSrc element;
 
     GstPad *sinkpad, *srcpad;
@@ -35,8 +36,8 @@ struct _GstColorBarsVideoSrc {
     static gboolean setcaps(GstBaseSrc* bsrc, GstCaps* caps);
 };
 
-void gst_color_bars_video_src_register();
+void gst_custom_video_src_register();
 
 // G_END_DECLS
 
-#endif /* __GST_GSTCOLORBARSVIDEOSRC_H__ */
+#endif /* __GST_GSTCUSTOMVIDEOSRC_H__ */

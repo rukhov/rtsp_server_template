@@ -47,5 +47,5 @@ target_link_libraries(${TARGET}
 target_sources(${TARGET} PRIVATE
     main-gstream.cpp
     picture_gen.cpp
-    GstColorBarsVideoSrc.cpp
+    GstCustomVideoSrc.cpp
 )
