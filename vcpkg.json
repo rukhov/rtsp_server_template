@@ -1,7 +1,5 @@
 {
   "dependencies": [
-    "gtest",
-    "opencv4",
     "gstreamer",
     "gst-rtsp-server"
   ],

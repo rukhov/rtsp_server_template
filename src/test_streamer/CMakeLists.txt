@@ -23,8 +23,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GStreamer REQUIRED gstreamer-1.0)
 pkg_check_modules(GstRtspServer REQUIRED gstreamer-rtsp-server-1.0)
 
-find_package(OpenCV REQUIRED)
-
 add_executable(${TARGET})
 
 target_precompile_headers(${TARGET} PRIVATE stdafx.h)
@@ -36,12 +34,10 @@ target_include_directories(${TARGET}
 
 target_sources(${TARGET} PRIVATE
     main-gstream.cpp
-    picture_gen.cpp
 )
 
 target_link_libraries(${TARGET} 
     PRIVATE ${GStreamer_LIBRARIES}
     PRIVATE ${GstRtspServer_LIBRARIES}
-    PRIVATE opencv_videoio opencv_imgcodecs opencv_imgproc
     PRIVATE lib_rtsp_streamer
 )

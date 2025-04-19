@@ -1,20 +1,13 @@
-#include <gst/gst.h>
-#include <gst/rtsp-server/rtsp-server.h>
-#include <iostream>
-#include <string>
-
 #include <rtsp_streamer/RtspStreamer.h>
 
-#include "picture_gen.h"
+#include "simple_frame_gen.h"
 
 int main(int argc, char* argv[])
 {
     rtsp_streamer::init(argc, argv);
 
-    auto streamer =
-        rtsp_streamer::make_rtsp_streamer(8554, "/custom_video_src", make_PictureGen());
-
-    // std::this_thread::sleep_for(std::chrono::seconds(10));
+    auto streamer = rtsp_streamer::make_rtsp_streamer(
+        8554, "/custom_video_src", std::make_unique<SimpleFrameGen>());
 
     streamer->Join();
 
