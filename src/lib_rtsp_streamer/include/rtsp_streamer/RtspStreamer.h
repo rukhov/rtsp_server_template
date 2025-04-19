@@ -27,9 +27,8 @@ public:
     virtual void Join() = 0;
 };
 
-std::unique_ptr<RtspStreamer>
-make_rtsp_streamer(uint16_t port,
-                   std::string const& mount_point,
-                   std::shared_ptr<FrameSource> frame_source);
+std::unique_ptr<RtspStreamer> make_streamer(uint16_t port,
+                                            std::string const& mount_point,
+                                            std::shared_ptr<FrameSource> frame_source);
 
 } // namespace rtsp_streamer

@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
 {
     rtsp_streamer::init(argc, argv);
 
-    auto streamer = rtsp_streamer::make_rtsp_streamer(
+    auto streamer = rtsp_streamer::make_streamer(
         8554, "/custom_video_src", std::make_unique<SimpleFrameGen>());
 
     streamer->Join();

@@ -10,8 +10,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GStreamer REQUIRED gstreamer-1.0)
 pkg_check_modules(GstRtspServer REQUIRED gstreamer-rtsp-server-1.0)
 
-find_package(OpenCV REQUIRED)
-
 add_library(${TARGET_NAME} STATIC)
 
 target_sources(${TARGET_NAME} PRIVATE

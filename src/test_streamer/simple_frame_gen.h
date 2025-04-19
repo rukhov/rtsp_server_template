@@ -7,9 +7,7 @@ class SimpleFrameGen : public rtsp_streamer::FrameSource
 #pragma pack(push, 1)
     struct _RGB {
 
-        uint8_t r;
-        uint8_t g;
-        uint8_t b;
+        uint8_t r, g, b;
     };
 #pragma pack(pop)
 

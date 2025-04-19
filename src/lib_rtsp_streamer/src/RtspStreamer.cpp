@@ -250,10 +250,9 @@ void init(int argc, char** argv)
     gst_custom_video_src_register();
 }
 
-std::unique_ptr<RtspStreamer>
-make_rtsp_streamer(uint16_t port,
-                   std::string const& mount_point,
-                   std::shared_ptr<FrameSource> frame_source)
+std::unique_ptr<RtspStreamer> make_streamer(uint16_t port,
+                                            std::string const& mount_point,
+                                            std::shared_ptr<FrameSource> frame_source)
 {
     auto streamer = std::make_unique<RtspStreamerImpl>();
     streamer->start(port, mount_point, frame_source);
