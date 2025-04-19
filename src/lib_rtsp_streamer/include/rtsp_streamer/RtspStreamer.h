@@ -24,6 +24,7 @@ class RtspStreamer
 {
 public:
     virtual ~RtspStreamer() = default;
+    virtual void Join() = 0;
 };
 
 std::unique_ptr<RtspStreamer>

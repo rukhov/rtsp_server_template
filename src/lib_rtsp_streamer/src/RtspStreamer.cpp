@@ -126,6 +126,14 @@ public:
     RtspStreamerImpl() {}
     ~RtspStreamerImpl() override { stop(); }
 
+private:
+    void Join() override
+    {
+        if (_thread.joinable()) {
+            _thread.join();
+        }
+    }
+
 public:
     void start(uint16_t port,
                std::string const& mount_point,
@@ -135,11 +143,9 @@ public:
             throw std::runtime_error("RTSP server is already running");
         }
 
-        _frame_source = frame_source;
-
         // Implementation of starting the RTSP server
 
-        gst_custom_video_src_register();
+        _frame_source = frame_source;
 
         // Create the pipeline
         gst_counted_ptr<GstElement> pipeline(gst_pipeline_new("my-pipeline"));
@@ -236,7 +242,13 @@ private:
 
 namespace rtsp_streamer {
 
-void init(int argc, char** argv) { gst_init(&argc, &argv); }
+void init(int argc, char** argv)
+{
+    if (!gst_is_initialized()) {
+        gst_init(&argc, &argv);
+    }
+    gst_custom_video_src_register();
+}
 
 std::unique_ptr<RtspStreamer>
 make_rtsp_streamer(uint16_t port,
