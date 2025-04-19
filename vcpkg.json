@@ -7,8 +7,6 @@
     "gst-rtsp-server"
   ],
   "vcpkg-configuration": {
-    "overlay-ports": [
-      "cmake/ports"
-    ]
+    "overlay-ports": []
   }
 }
