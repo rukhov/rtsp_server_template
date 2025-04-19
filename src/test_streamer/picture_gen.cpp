@@ -15,8 +15,6 @@ inline void log(std::format_string<_Args...> __fmt, _Args&&... __args)
           GLogLevelFlags::G_LOG_LEVEL_MESSAGE,
           "%s",
           std::vformat(__fmt.get(), std::make_format_args(__args...)).c_str());
-    // g_print(">>>>>>>>>>>: %s", std::vformat(__fmt.get(),
-    // std::make_format_args(__args...)).c_str());
 }
 
 #pragma pack(push, 1)
@@ -31,7 +29,6 @@ struct _RGB {
 class PictureGenImpl : public rtsp_streamer::FrameSource
 {
     GstVideoInfo _format;
-    std::vector<uint8_t> _farme_buffer;
     size_t _frame_counter = 0;
     cv::Mat _image;
 
@@ -51,8 +48,6 @@ private:
 
         _format = format;
 
-        _farme_buffer.resize(get_ftrame_size());
-
         _image = cv::Mat(
             _format.height, _format.width, CV_8UC3, cv::Scalar_<uint8_t>(255, 255, 255));
     }
@@ -63,7 +58,7 @@ private:
 
     std::span<uint8_t> get_next_frame() override
     {
-        assert(_farme_buffer.size() > 0);
+        assert(get_ftrame_size() > 0);
 
         auto shift = _frame_counter % 255;
 
@@ -95,12 +90,10 @@ private:
                         thickness,
                         cv::LINE_AA);
         }
-        _image.copyTo(
-            cv::Mat(_format.height, _format.width, CV_8UC3, _farme_buffer.data()));
 
         ++_frame_counter;
 
-        return { _farme_buffer.data(), _farme_buffer.size() };
+        return { _image.data, get_ftrame_size() };
     }
 };
 } // namespace
