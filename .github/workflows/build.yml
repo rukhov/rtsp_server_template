@@ -1,0 +1,73 @@
+name: Build RTSP streamer template
+run-name: Build No.${{ github.run_number }} on behalf of ${{ github.actor }}
+
+on:
+    workflow_dispatch:
+    pull_request: 
+        types: [opened, reopened, synchronize]
+    push: 
+        branches: [main]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: windows-latest
+            platform: windows
+            arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+    steps:
+
+      - name: Install Ubuntu Prerequisites
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
+          gcc --version
+          #sudo apt-get update
+          # sudo apt-get --yes install autoconf automake pkg-config autoconf-archive
+          # sudo apt-get --yes install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+
+      - name: Install Windows Prerequisites
+        if: ${{ matrix.platform == 'windows' }}
+        run: |
+          # pip3 install opencv-python pytest
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: vcpkg build
+        id: vcpkg
+        uses: johnwason/vcpkg-action@v6
+        with:
+          manifest-dir: ${{ github.workspace }} # Set to directory containing vcpkg.json
+          triplet: ${{ matrix.arch}}-${{matrix.platform}}-release
+          token: ${{ github.token }}
+          github-binarycache: true
+
+      - name: Configure project
+        run: |
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} --preset=${{ matrix.platform }}-rel -S ./ -B ./build
+
+      - name: Build
+        run: |
+          cmake --build ./build --config=RelWithDebInfo
+
+      - name: Make installation
+        run: |
+          cmake --install ./build --prefix=./install --config=RelWithDebInfo
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rtsp_server_template-${{ matrix.platform }}
+          include-hidden-files: true
+          path: |
+            install/
+
+      - name: Run Tests
+        run: |
+          ctest --test-dir ./build -T test --output-on-failure -C RelWithDebInfo --verbose --output-log ./reports/tests.log
