@@ -28,23 +28,28 @@ struct _RGB {
 };
 #pragma pack(pop)
 
-using namespace gst;
-
-class PictureGenImpl : public PictureGen
+class PictureGenImpl : public rtsp_streamer::FrameSource
 {
-    const GstVideoInfo _format;
+    GstVideoInfo _format;
     std::vector<uint8_t> _farme_buffer;
     size_t _frame_counter = 0;
     cv::Mat _image;
 
 public:
-    PictureGenImpl(GstVideoInfo const& format) : _format(format)
+    PictureGenImpl() {}
+    ~PictureGenImpl() {}
+
+    // PictureGen
+private:
+    void set_format(GstVideoInfo const& format) override
     {
-        assert(_format.finfo->format == GST_VIDEO_FORMAT_RGB);
-        assert(_format.finfo->bits == 8);
-        assert(_format.finfo->n_components == 3);
-        assert(_format.finfo->depth[0] == 8 && _format.finfo->depth[1] == 8 &&
-               _format.finfo->depth[2] == 8 && _format.finfo->depth[3] == 0);
+        assert(format.finfo->format == GST_VIDEO_FORMAT_RGB);
+        assert(format.finfo->bits == 8);
+        assert(format.finfo->n_components == 3);
+        assert(format.finfo->depth[0] == 8 && format.finfo->depth[1] == 8 &&
+               format.finfo->depth[2] == 8 && format.finfo->depth[3] == 0);
+
+        _format = format;
 
         _farme_buffer.resize(get_ftrame_size());
 
@@ -52,12 +57,14 @@ public:
             _format.height, _format.width, CV_8UC3, cv::Scalar_<uint8_t>(255, 255, 255));
     }
 
-    // PictureGen
-private:
+    bool is_eof() const override { return false; }
+
     size_t get_ftrame_size() const override { return _format.width * _format.height * 3; }
 
     std::span<uint8_t> get_next_frame() override
     {
+        assert(_farme_buffer.size() > 0);
+
         auto shift = _frame_counter % 255;
 
         for (size_t x = 0; x < _format.width; ++x) {
@@ -98,10 +105,7 @@ private:
 };
 } // namespace
 
-namespace gst {
-
-PictureGen* make_PictureGen(GstVideoInfo const& format)
+std::unique_ptr<rtsp_streamer::FrameSource> make_PictureGen()
 {
-    return new PictureGenImpl(format);
+    return std::make_unique<PictureGenImpl>();
 }
-} // namespace gst

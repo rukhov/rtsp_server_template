@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "format": "cpp"
+        "format": "cpp",
+        "thread": "cpp"
     },
     "[cpp]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"

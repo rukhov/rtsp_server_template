@@ -4,6 +4,8 @@
 #include <gst/gst.h>
 #include <gst/video/gstvideometa.h>
 
+#include "RtspStreamer.h"
+
 namespace gst {
 class PictureGen;
 }
@@ -21,7 +23,8 @@ struct _GstCustomVideoSrc {
 
     std::string _negotiated_caps;
     GstVideoInfo _video_info;
-    gst::PictureGen* _picture_gen;
+    std::shared_ptr<rtsp_streamer::FrameSource> _frame_source;
+    std::atomic_flag _eos;
     size_t _frame_counter = 0;
     std::chrono::high_resolution_clock::time_point _next_frame;
 

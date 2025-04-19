@@ -1,4 +1,3 @@
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -9,7 +8,6 @@
 #include <gst/video/gstvideopool.h>
 
 #include "GstCustomVideoSrc.h"
-#include "picture_gen.h"
 
 GST_DEBUG_CATEGORY_STATIC(gst_custom_video_src_debug);
 #define GST_CAT_DEFAULT gst_custom_video_src_debug
@@ -142,8 +140,7 @@ void _GstCustomVideoSrc::get_property(GObject* object,
 void _GstCustomVideoSrc::finalize(GObject* object)
 {
     GstCustomVideoSrc* filter = GST_CUSTOMVIDEOSRC(object);
-    delete filter->_picture_gen;
-    filter->_picture_gen = nullptr;
+    filter->_frame_source.reset();
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -215,13 +212,17 @@ GstFlowReturn _GstCustomVideoSrc::create(GstPushSrc* src, GstBuffer** buf)
 
     std::this_thread::sleep_until(self->_next_frame);
 
+    if (self->_eos.test() || self->_frame_source->is_eof()) {
+        return GST_FLOW_EOS;
+    }
+
     GstBuffer* buffer =
-        gst_buffer_new_allocate(nullptr, self->_picture_gen->get_ftrame_size(), nullptr);
+        gst_buffer_new_allocate(nullptr, self->_frame_source->get_ftrame_size(), nullptr);
     GstMapInfo map;
 
     if (gst_buffer_map(buffer, &map, GST_MAP_WRITE)) {
 
-        auto src = self->_picture_gen->get_next_frame();
+        auto src = self->_frame_source->get_next_frame();
         auto dst = map.data;
 
         std::copy(src.begin(), src.end(), dst);
@@ -292,12 +293,13 @@ gboolean _GstCustomVideoSrc::setcaps(GstBaseSrc* bsrc, GstCaps* caps)
         }
     }
 
-    // If you found a compatible format, store the negotiated caps
+    // If I found a compatible format, store the negotiated caps
     if (ret) {
 
         self->_negotiated_caps = caps_str;
-        assert(self->_picture_gen == nullptr);
-        self->_picture_gen = gst::make_PictureGen(self->_video_info);
+        assert(self->_frame_source);
+        self->_eos.clear();
+        self->_frame_source->set_format(self->_video_info);
     }
 
     return ret;

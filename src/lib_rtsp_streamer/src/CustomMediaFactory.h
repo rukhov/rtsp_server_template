@@ -16,20 +16,6 @@ static GstElement* my_media_factory_create_element(GstRTSPMediaFactory* factory,
                                                    const GstRTSPUrl* url)
 {
     auto self = (MyMediaFactoryClass*)(factory);
-
-    // Build your pipeline programmatically
-    GstElement* pipeline = gst_pipeline_new("pipeline");
-    GstElement* src = gst_element_factory_make("videotestsrc", "src");
-    GstElement* enc = gst_element_factory_make("x264enc", "enc");
-    GstElement* pay = gst_element_factory_make("rtph264pay", "pay");
-
-    // Configure elements
-    g_object_set(pay, "pt", 96, "name", "pay0", NULL);
-
-    // Add and link elements
-    gst_bin_add_many(GST_BIN(pipeline), src, enc, pay, NULL);
-    gst_element_link_many(src, enc, pay, NULL);
-
     return self->the_piplene;
 }
 

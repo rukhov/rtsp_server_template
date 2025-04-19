@@ -8,7 +8,7 @@
             "name": "Linux - Integration Tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/../build/rtsp_server_sample",
+            "program": "${workspaceFolder}/../build/src/test_streamer/test_streamer",
             "args": [],
             "environment": [
                 {
@@ -17,7 +17,7 @@
                 },
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/../build",
+            "cwd": "${workspaceFolder}/../build/src/test_streamer",
             "externalConsole": false,
             "avoidWindowsConsoleRedirection": true,
             "setupCommands": [
