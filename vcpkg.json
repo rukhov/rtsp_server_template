@@ -1,7 +1,8 @@
 {
   "dependencies": [
     "gstreamer",
-    "gst-rtsp-server"
+    "gst-rtsp-server",
+    "pkgconf"
   ],
   "vcpkg-configuration": {
     "overlay-ports": []
