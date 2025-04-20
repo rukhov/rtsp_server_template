@@ -171,6 +171,7 @@ public:
         if constexpr (0) {
             // For testing purposes
             factory.reset(gst_rtsp_media_factory_new());
+            g_object_ref(factory.get());
             gst_rtsp_media_factory_set_launch(
                 factory.get(),
                 "( videotestsrc is-live=1 pattern=smpte ! "
