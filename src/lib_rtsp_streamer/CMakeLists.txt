@@ -27,18 +27,8 @@ target_include_directories(${TARGET_NAME}
     INTERFACE ${GStreamer_INCLUDE_DIRS} 
 )
 
-target_link_directories(${TARGET_NAME} 
-    PRIVATE ${GStreamer_LIBRARY_DIRS} 
-    PRIVATE ${GstRtspServer_LIBRARY_DIRS}
-)
-
-message("============= GStreamer_LIBRARY_DIRS: ${GStreamer_LIBRARY_DIRS}")
-message("============= GstRtspServer_LIBRARY_DIRS: ${GstRtspServer_LIBRARY_DIRS}")
-message("============= GStreamer_LIBRARIES: ${GStreamer_LIBRARIES}")
-message("============= GstRtspServer_LIBRARIES: ${GstRtspServer_LIBRARIES}")
-
 target_link_libraries(${TARGET_NAME} 
-    PRIVATE ${GStreamer_LIBRARIES}
-    PRIVATE ${GstRtspServer_LIBRARIES}
+    PRIVATE ${GStreamer_LINK_LIBRARIES}
+    PRIVATE ${GstRtspServer_LINK_LIBRARIES}
     PRIVATE opencv_videoio opencv_imgcodecs opencv_imgproc
 )
