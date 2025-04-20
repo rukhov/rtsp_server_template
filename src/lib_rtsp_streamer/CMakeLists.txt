@@ -32,6 +32,11 @@ target_link_directories(${TARGET_NAME}
     PRIVATE ${GstRtspServer_LIBRARY_DIRS}
 )
 
+message("============= GStreamer_LIBRARY_DIRS: ${GStreamer_LIBRARY_DIRS}")
+message("============= GstRtspServer_LIBRARY_DIRS: ${GstRtspServer_LIBRARY_DIRS}")
+message("============= GStreamer_LIBRARIES: ${GStreamer_LIBRARIES}")
+message("============= GstRtspServer_LIBRARIES: ${GstRtspServer_LIBRARIES}")
+
 target_link_libraries(${TARGET_NAME} 
     PRIVATE ${GStreamer_LIBRARIES}
     PRIVATE ${GstRtspServer_LIBRARIES}
