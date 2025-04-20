@@ -30,5 +30,4 @@ target_include_directories(${TARGET_NAME}
 target_link_libraries(${TARGET_NAME} 
     PRIVATE ${GStreamer_LINK_LIBRARIES}
     PRIVATE ${GstRtspServer_LINK_LIBRARIES}
-    PRIVATE opencv_videoio opencv_imgcodecs opencv_imgproc
 )
