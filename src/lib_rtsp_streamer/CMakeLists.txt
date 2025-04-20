@@ -27,6 +27,11 @@ target_include_directories(${TARGET_NAME}
     INTERFACE ${GStreamer_INCLUDE_DIRS} 
 )
 
+target_link_directories(${TARGET_NAME} 
+    PRIVATE ${GStreamer_LIBRARY_DIRS} 
+    PRIVATE ${GstRtspServer_LIBRARY_DIRS}
+)
+
 target_link_libraries(${TARGET_NAME} 
     PRIVATE ${GStreamer_LIBRARIES}
     PRIVATE ${GstRtspServer_LIBRARIES}
