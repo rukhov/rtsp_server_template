@@ -147,9 +147,6 @@ public:
 
         _frame_source = frame_source;
 
-        // Create the pipeline
-        gst_counted_ptr<GstElement> pipeline(gst_pipeline_new("my-pipeline"));
-
         /* create a server instance */
         _server.reset(gst_rtsp_server_new());
         g_object_ref(_server.get());

@@ -27,7 +27,7 @@ jobs:
         if: ${{ matrix.platform == 'linux' }}
         run: |
           gcc --version
-          sudo apt-get --yes install autoconf automake autoconf-archive pkg-config
+          sudo apt-get --yes install autoconf automake autoconf-archive
           sudo apt-get --yes install nasm
           sudo apt-get --yes install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 

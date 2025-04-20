@@ -1,6 +1,11 @@
 {
   "dependencies": [
-    "gstreamer",
+    {
+      "name": "gstreamer",
+      "features": [
+        "x264"
+      ]
+    },
     "gst-rtsp-server",
     "pkgconf"
   ],

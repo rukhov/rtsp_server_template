@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS Off)
 
 include(FindPkgConfig)
-find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(GStreamer REQUIRED gstreamer-1.0)
 pkg_check_modules(GstRtspServer REQUIRED gstreamer-rtsp-server-1.0)
