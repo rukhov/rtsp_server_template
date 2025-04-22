@@ -5,6 +5,15 @@
 
 namespace {
 
+template <typename... _Args>
+inline void log(std::format_string<_Args...> __fmt, _Args&&... __args)
+{
+    g_log("CUSTOM_VIDEO_SRC",
+          GLogLevelFlags::G_LOG_LEVEL_MESSAGE,
+          "%s",
+          std::vformat(__fmt.get(), std::make_format_args(__args...)).c_str());
+}
+
 using namespace rtsp_streamer;
 
 std::tuple<GstElement*, GstCustomVideoSrc*>
@@ -165,7 +174,7 @@ public:
 
         gst_counted_ptr<GstRTSPMediaFactory> factory;
 
-        if constexpr (0) {
+        if constexpr (1) {
             // For testing purposes
             factory.reset(gst_rtsp_media_factory_new());
             g_object_ref(factory.get());
@@ -238,12 +247,81 @@ private:
 };
 } // namespace
 
+// extern "C" void gst_init_static_plugins();
+
+
+// #pragma message "GStreamer static linking : " GSTREAMER_STATIC_LINKING
+
+#if GSTREAMER_STATIC_LINKING == 1
+extern "C" {
+#include "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/config.h"
+#include "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/gstinitstaticplugins.c"
+}
+#endif
+
+using void_fn_t = void (*)(void);
+using gst_init_fn_t = void (*)(int* argc, char** argv[]);
+
 namespace rtsp_streamer {
 
 void init(int argc, char** argv)
 {
     if (!gst_is_initialized()) {
         gst_init(&argc, &argv);
+
+
+#if GSTREAMER_STATIC_LINKING == 1
+        gst_init_static_plugins();
+#endif
+
+        if constexpr (0) {
+
+            if constexpr (0) {
+
+                GError* err = nullptr;
+
+                // Load a plugin from a specific .so file
+                GstPlugin* plugin = gst_plugin_load_file(
+                    //"/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/"
+                    //"/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-rel/"
+                    "./libgstreamer-full-1.0.so", // Path to the .so file
+                    &err                          // Optional error tracking
+                );
+
+                if (!plugin || err) {
+                    log("Failed to load plugin!: {}", err->message);
+                }
+
+                auto filename = "./libgstreamer-full-1.0.so";
+
+                auto module = g_module_open(filename, G_MODULE_BIND_LOCAL);
+
+                {
+                    auto symname = "gst_init";
+
+                    gst_init_fn_t gst_init_ptr = nullptr;
+
+                    auto ret = g_module_symbol(module, symname, (void**)&gst_init_ptr);
+
+                    gst_init_ptr(&argc, &argv);
+                }
+                {
+                    auto symname = "gst_init_static_plugins";
+
+                    void_fn_t gst_init_static_plugins_ptr = nullptr;
+
+                    auto ret = g_module_symbol(
+                        module, symname, (void**)&gst_init_static_plugins_ptr);
+
+                    gst_init_static_plugins_ptr();
+                }
+            }
+
+            auto vtst_factory = gst_element_factory_find("videotestsrc");
+
+            auto vtst_element =
+                gst_element_factory_make("videotestsrc", "my_videotestsrc");
+        }
     }
     gst_custom_video_src_register();
 }

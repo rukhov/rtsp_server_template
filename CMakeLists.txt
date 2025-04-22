@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED On)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS Off)
 
+set(GSTREAMER_STATIC_LINKING ON)
+
 if(UNIX)
 #    add_compile_options( $<$<CONFIG:Debug>:-g3 -O0> )
     if( CMAKE_BUILD_TYPE EQUAL "Debug" )

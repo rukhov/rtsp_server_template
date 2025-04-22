@@ -5,15 +5,104 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Linux - Integration Tests",
+            "name": "Linux - Integration Tests - vcpkg gstreamer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../build/src/test_streamer/test_streamer",
+            "args": [],
+            "environment": [
+                //{"name": "GST_PLUGIN_SYSTEM_PATH_1_0", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg"},
+                //{"name": "LD_LIBRARY_PATH", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg" },
+                //{"name": "GST_PLUGIN_PATH", "value": "/lib/x86_64-linux-gnu/gstreamer-1.0" },
+                //{"name": "GST_PLUGIN_PATH", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib/gstreamer-1.0:/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib:/lib/x86_64-linux-gnu" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/home/rukhov/projects/github/rtsp_server_sample/build/vcpkg_installed/x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                {
+                    "name": "GST_DEBUG",
+                    "value": "4"
+                },
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../build/src/test_streamer",
+            "externalConsole": false,
+            "avoidWindowsConsoleRedirection": true,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Linux - instect - vcpkg gstreamer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/gst-inspect-1.0",
+            "args": [
+                "videotestsrc"
+            ],
+            "environment": [
+                //{"name": "GST_PLUGIN_SYSTEM_PATH_1_0", "value": "" },
+                //{"name": "LD_LIBRARY_PATH", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg" },
+                //{"name": "GST_PLUGIN_PATH", "value": "/lib/x86_64-linux-gnu/gstreamer-1.0" },
+                //{"name": "GST_PLUGIN_PATH", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-rel" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib/gstreamer-1.0:/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib:/lib/x86_64-linux-gnu" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/gst-plugin-scanner" },
+                {
+                    "name": "GST_DEBUG",
+                    "value": "4"
+                },
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../build/src/test_streamer",
+            "externalConsole": false,
+            "avoidWindowsConsoleRedirection": true,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Linux - Integration Tests - ubuntu gstreamer",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/../build/src/test_streamer/test_streamer",
             "args": [],
             "environment": [
                 {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/lib/x86_64-linux-gnu:/home/rukhov/Qt/6.8.2/gcc_64/lib"
+                },
+                //{"name": "GST_PLUGIN_PATH","value": "/lib/x86_64-linux-gnu" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib" },
+                //{"name": "GST_PLUGIN_PATH", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib/gstreamer-1.0:/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib:/lib/x86_64-linux-gnu" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                {
+                    "name": "GST_PLUGIN_PATH",
+                    "value": "/lib/x86_64-linux-gnu/gstreamer-1.0"
+                },
+                {
+                    "name": "GST_PLUGIN_SCANNER",
+                    "value": "/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner"
+                },
+                {
                     "name": "GST_DEBUG",
-                    "value": "2"
+                    "value": "4"
                 },
             ],
             "stopAtEntry": false,
