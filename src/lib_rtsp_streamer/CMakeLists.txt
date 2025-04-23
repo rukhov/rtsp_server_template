@@ -37,7 +37,7 @@ target_include_directories(${TARGET_NAME}
     INTERFACE ${GStreamer_INCLUDE_DIRS} 
 )
 
-#message("==================== GStreamer_INCLUDE_DIRS: ${GStreamer_INCLUDE_DIRS}")
+message("==================== GStreamer_INCLUDE_DIRS: ${GStreamer_INCLUDE_DIRS}")
 
 if (${GSTREAMER_STATIC_LINKING})
 
