@@ -247,15 +247,17 @@ private:
 };
 } // namespace
 
-// extern "C" void gst_init_static_plugins();
+extern "C" void gst_init_static_plugins();
 
 
 // #pragma message "GStreamer static linking : " GSTREAMER_STATIC_LINKING
 
 #if GSTREAMER_STATIC_LINKING == 1
 extern "C" {
-#include "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/config.h"
-#include "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/gstinitstaticplugins.c"
+// #include
+// "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/config.h"
+// #include
+// "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/gstinitstaticplugins.c"
 }
 #endif
 
