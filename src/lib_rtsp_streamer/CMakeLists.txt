@@ -6,8 +6,11 @@ set(CMAKE_CXX_EXTENSIONS Off)
 
 include(FindPkgConfig)
 
-pkg_check_modules(GStreamer REQUIRED gstreamer-1.0)
-pkg_check_modules(GStreamerFull REQUIRED gstreamer-full-1.0)
+#pkg_check_modules(GLIB REQUIRED glib-2.0)
+
+pkg_check_modules(GStreamer REQUIRED gstreamer-1.0 gstreamer-base-1.0 gstreamer-video-1.0 gstreamer-rtsp-1.0)
+#pkg_check_modules(GStreamer REQUIRED gstreamer-1.0 gstreamer-plugins-base-1.0 gstreamer-plugins-good-1.0 gstreamer-plugins-bad-1.0)
+#pkg_check_modules(GStreamerFull REQUIRED gstreamer-full-1.0)
 #pkg_check_modules(GStreamerBase REQUIRED gstreamer-plugins-base-1.0)
 #pkg_check_modules(GStreamerGood REQUIRED gstreamer-plugins-good-1.0)
 #pkg_check_modules(GStreamerBad REQUIRED gstreamer-plugins-bad-1.0)
@@ -20,6 +23,7 @@ add_library(${TARGET_NAME} STATIC)
 target_sources(${TARGET_NAME} PRIVATE
     src/GstCustomVideoSrc.cpp
     src/RtspStreamer.cpp
+    src/CustomMediaFactory.cpp
 )
 
 target_precompile_headers(${TARGET_NAME} PRIVATE src/stdafx.h)
@@ -33,7 +37,7 @@ target_include_directories(${TARGET_NAME}
     INTERFACE ${GStreamer_INCLUDE_DIRS} 
 )
 
-#message("==================== GStreamerPluginsBase_LINK_LIBRARIES: ${GStreamerPluginsBase_LINK_LIBRARIES}")
+message("==================== GStreamer_INCLUDE_DIRS: ${GStreamer_INCLUDE_DIRS}")
 
 if (${GSTREAMER_STATIC_LINKING})
 
@@ -46,10 +50,14 @@ if (${GSTREAMER_STATIC_LINKING})
     target_compile_options( ${TARGET_NAME} PRIVATE -DGSTREAMER_STATIC_LINKING=1)
 else()
 
+    list(REMOVE_ITEM GStreamer_LINK_LIBRARIES "gstreamer-full-1.0")
     target_link_libraries(${TARGET_NAME} 
         INTERFACE 
+            #${GLIB_LIBRARIES}
             ${GStreamer_LIBRARIES}
-            ${GstRtspServer_LINK_IBRARIES} 
+            #${GStreamerFull_LINK_LIBRARIES}
+            ${GstRtspServer_LIBRARIES} 
+            gstbase-1.0
     )
     target_compile_options( ${TARGET_NAME} PRIVATE -DGSTREAMER_STATIC_LINKING=0)
 endif()

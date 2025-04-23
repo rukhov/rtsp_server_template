@@ -2,6 +2,7 @@
 #include <cassert>
 #include <chrono>
 #include <format>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <span>

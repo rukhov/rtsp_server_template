@@ -1,6 +1,5 @@
 {
   "dependencies": [
-    "gst-rtsp-server",
     "pkgconf"
   ],
   "vcpkg-configuration": {

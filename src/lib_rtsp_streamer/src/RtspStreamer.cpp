@@ -130,6 +130,7 @@ class RtspStreamerImpl : public RtspStreamer
     gst_counted_ptr<GstCustomVideoSrc> _source;
     gst_counted_ptr<GstElement> _pipeline;
     gst_uncounted_ptr<GMainLoop> _loop;
+    gst_counted_ptr<GstRTSPMediaFactory> _factory;
 
 public:
     RtspStreamerImpl() {}
@@ -172,19 +173,18 @@ public:
          * any launch line works as long as it contains elements named pay%d. Each
          * element with pay%d names will be a stream */
 
-        gst_counted_ptr<GstRTSPMediaFactory> factory;
-
-        if constexpr (1) {
+        if constexpr (0) {
             // For testing purposes
-            factory.reset(gst_rtsp_media_factory_new());
-            g_object_ref(factory.get());
+            _factory.reset(gst_rtsp_media_factory_new());
+            g_object_ref(_factory.get());
             gst_rtsp_media_factory_set_launch(
-                factory.get(),
-                "( videotestsrc is-live=1 pattern=smpte ! "
+                _factory.get(),
+                "( videotestsrc pattern=smpte ! "
                 "video/x-raw,width=640,height=480,framerate=30/1 "
                 "! x264enc key-int-max=30 tune=zerolatency ! h264parse "
                 "! rtph264pay config-interval=-1 pt=96 name=pay0 )");
         } else {
+
             auto [pipeline_, source] = create_custom_rtsp_pipeline(_frame_source);
             if (!pipeline_ || !source) {
                 throw std::runtime_error("Failed to create pipeline");
@@ -194,16 +194,17 @@ public:
             _source.reset(source);
             g_object_ref(_source.get());
             _source->_eos.clear();
-            factory.reset(my_media_factory_new(_pipeline.get()));
-            // factory.reset(gst_rtsp_media_factory_new());
-            g_object_ref(factory.get());
+
+            _factory.reset(gst_custom_video_src_media_factory_new(pipeline_));
+
+            g_object_ref(_factory.get());
         }
 
-        gst_rtsp_media_factory_set_shared(factory.get(), TRUE);
+        gst_rtsp_media_factory_set_shared(_factory.get(), TRUE);
 
         /* attach the factory to the mount_point url */
         gst_rtsp_mount_points_add_factory(
-            mounts.get(), mount_point.c_str(), factory.get());
+            mounts.get(), mount_point.c_str(), _factory.get());
 
         /* don't need the ref to the mapper anymore */
         mounts.reset();
