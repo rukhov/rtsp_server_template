@@ -122,7 +122,7 @@
             ]
         },
         {
-            "name": "Windows - Test",
+            "name": "Windows - Test - debug",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/../build/src/test_streamer/Debug/test_streamer.exe",
@@ -145,6 +145,40 @@
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../build/src/test_streamer/Debug",
+            "externalConsole": true,
+            //"avoidWindowsConsoleRedirection": true,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Windows - Test - release",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../build/src/test_streamer/RelWithDebInfo/test_streamer.exe",
+            "args": [],
+            "environment": [
+                {
+                    "name": "GST_PLUGIN_SYSTEM_PATH_1_0",
+                    "value": "${workspaceFolder}/../build/src/test_streamer/RelWithDebInfo"
+                },
+                {
+                    "name": "GST_PLUGIN_PATH",
+                    "value": "${workspaceFolder}/../build/src/test_streamer/RelWithDebInfo"
+                },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/home/rukhov/projects/github/rtsp_server_sample/build/vcpkg_installed/x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                {
+                    "name": "GST_DEBUG",
+                    "value": "3"
+                },
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../build/src/test_streamer/RelWithDebInfo",
             "externalConsole": true,
             //"avoidWindowsConsoleRedirection": true,
             "setupCommands": [

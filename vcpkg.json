@@ -11,7 +11,8 @@
         "x264"
       ]
     },
-    "gst-rtsp-server"
+    "gst-rtsp-server",
+    "x264"
   ],
   "vcpkg-configuration": {
     "overlay-ports": []
