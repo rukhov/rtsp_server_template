@@ -73,8 +73,10 @@ else()
     )
     target_link_libraries(${TARGET_NAME} 
         INTERFACE 
-            ${GStreamer_LIBRARIES}
-            ${GstRtspServer_LIBRARIES} 
+            #${GStreamer_LIBRARIES}
+            #${GstRtspServer_LIBRARIES} 
+            ${GStreamer_LINK_LIBRARIES}
+            ${GstRtspServer_LINK_LIBRARIES} 
     )
     target_link_options(${TARGET_NAME}
         INTERFACE 
