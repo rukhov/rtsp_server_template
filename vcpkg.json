@@ -1,14 +1,19 @@
 {
   "dependencies": [
-    "boost",
-    "gtest",
-    "opencv4",
-    "gstreamer",
+    "pkgconf",
+    {
+      "name": "gstreamer",
+      "features": [
+        "plugins-base",
+        "plugins-good",
+        "plugins-bad",
+        "plugins-ugly",
+        "x264"
+      ]
+    },
     "gst-rtsp-server"
   ],
   "vcpkg-configuration": {
-    "overlay-ports": [
-      "cmake/ports"
-    ]
+    "overlay-ports": []
   }
 }

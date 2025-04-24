@@ -5,6 +5,15 @@
 
 namespace {
 
+template <typename... _Args>
+inline void log(std::format_string<_Args...> __fmt, _Args&&... __args)
+{
+    g_log("CUSTOM_VIDEO_SRC",
+          GLogLevelFlags::G_LOG_LEVEL_MESSAGE,
+          "%s",
+          std::vformat(__fmt.get(), std::make_format_args(__args...)).c_str());
+}
+
 using namespace rtsp_streamer;
 
 std::tuple<GstElement*, GstCustomVideoSrc*>
@@ -121,6 +130,7 @@ class RtspStreamerImpl : public RtspStreamer
     gst_counted_ptr<GstCustomVideoSrc> _source;
     gst_counted_ptr<GstElement> _pipeline;
     gst_uncounted_ptr<GMainLoop> _loop;
+    gst_counted_ptr<GstRTSPMediaFactory> _factory;
 
 public:
     RtspStreamerImpl() {}
@@ -147,9 +157,6 @@ public:
 
         _frame_source = frame_source;
 
-        // Create the pipeline
-        gst_counted_ptr<GstElement> pipeline(gst_pipeline_new("my-pipeline"));
-
         /* create a server instance */
         _server.reset(gst_rtsp_server_new());
         g_object_ref(_server.get());
@@ -166,18 +173,18 @@ public:
          * any launch line works as long as it contains elements named pay%d. Each
          * element with pay%d names will be a stream */
 
-        gst_counted_ptr<GstRTSPMediaFactory> factory;
-
         if constexpr (0) {
             // For testing purposes
-            factory.reset(gst_rtsp_media_factory_new());
+            _factory.reset(gst_rtsp_media_factory_new());
+            g_object_ref(_factory.get());
             gst_rtsp_media_factory_set_launch(
-                factory.get(),
-                "( videotestsrc is-live=1 pattern=smpte ! "
+                _factory.get(),
+                "( videotestsrc pattern=smpte ! "
                 "video/x-raw,width=640,height=480,framerate=30/1 "
                 "! x264enc key-int-max=30 tune=zerolatency ! h264parse "
                 "! rtph264pay config-interval=-1 pt=96 name=pay0 )");
         } else {
+
             auto [pipeline_, source] = create_custom_rtsp_pipeline(_frame_source);
             if (!pipeline_ || !source) {
                 throw std::runtime_error("Failed to create pipeline");
@@ -187,16 +194,17 @@ public:
             _source.reset(source);
             g_object_ref(_source.get());
             _source->_eos.clear();
-            factory.reset(my_media_factory_new(_pipeline.get()));
-            // factory.reset(gst_rtsp_media_factory_new());
-            g_object_ref(factory.get());
+
+            _factory.reset(gst_custom_video_src_media_factory_new(pipeline_));
+
+            g_object_ref(_factory.get());
         }
 
-        gst_rtsp_media_factory_set_shared(factory.get(), TRUE);
+        gst_rtsp_media_factory_set_shared(_factory.get(), TRUE);
 
         /* attach the factory to the mount_point url */
         gst_rtsp_mount_points_add_factory(
-            mounts.get(), mount_point.c_str(), factory.get());
+            mounts.get(), mount_point.c_str(), _factory.get());
 
         /* don't need the ref to the mapper anymore */
         mounts.reset();
@@ -240,20 +248,88 @@ private:
 };
 } // namespace
 
+extern "C" void gst_init_static_plugins();
+
+
+// #pragma message "GStreamer static linking : " GSTREAMER_STATIC_LINKING
+
+#if GSTREAMER_STATIC_LINKING == 1
+extern "C" {
+#include "/path_to/config.h"
+#include "/path_to/gstinitstaticplugins.c"
+}
+#endif
+
+using void_fn_t = void (*)(void);
+using gst_init_fn_t = void (*)(int* argc, char** argv[]);
+
 namespace rtsp_streamer {
 
 void init(int argc, char** argv)
 {
     if (!gst_is_initialized()) {
         gst_init(&argc, &argv);
+
+
+#if GSTREAMER_STATIC_LINKING == 1
+        gst_init_static_plugins();
+#endif
+
+        if constexpr (0) {
+
+            if constexpr (0) {
+
+                GError* err = nullptr;
+
+                // Load a plugin from a specific .so file
+                GstPlugin* plugin = gst_plugin_load_file(
+                    //"/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/"
+                    //"/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-rel/"
+                    "./libgstreamer-full-1.0.so", // Path to the .so file
+                    &err                          // Optional error tracking
+                );
+
+                if (!plugin || err) {
+                    log("Failed to load plugin!: {}", err->message);
+                }
+
+                auto filename = "./libgstreamer-full-1.0.so";
+
+                auto module = g_module_open(filename, G_MODULE_BIND_LOCAL);
+
+                {
+                    auto symname = "gst_init";
+
+                    gst_init_fn_t gst_init_ptr = nullptr;
+
+                    auto ret = g_module_symbol(module, symname, (void**)&gst_init_ptr);
+
+                    gst_init_ptr(&argc, &argv);
+                }
+                {
+                    auto symname = "gst_init_static_plugins";
+
+                    void_fn_t gst_init_static_plugins_ptr = nullptr;
+
+                    auto ret = g_module_symbol(
+                        module, symname, (void**)&gst_init_static_plugins_ptr);
+
+                    gst_init_static_plugins_ptr();
+                }
+            }
+
+            auto vtst_factory = gst_element_factory_find("videotestsrc");
+
+            auto vtst_element =
+                gst_element_factory_make("videotestsrc", "my_videotestsrc");
+        }
     }
     gst_custom_video_src_register();
 }
 
-std::unique_ptr<RtspStreamer>
-make_rtsp_streamer(uint16_t port,
-                   std::string const& mount_point,
-                   std::shared_ptr<FrameSource> frame_source)
+std::unique_ptr<RtspStreamer> make_streamer(uint16_t port,
+                                            std::string const& mount_point,
+                                            std::shared_ptr<FrameSource> frame_source)
 {
     auto streamer = std::make_unique<RtspStreamerImpl>();
     streamer->start(port, mount_point, frame_source);
