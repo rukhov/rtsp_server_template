@@ -10,7 +10,8 @@
         "plugins-ugly",
         "x264"
       ]
-    }
+    },
+    "gst-rtsp-server"
   ],
   "vcpkg-configuration": {
     "overlay-ports": []
