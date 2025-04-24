@@ -255,10 +255,8 @@ extern "C" void gst_init_static_plugins();
 
 #if GSTREAMER_STATIC_LINKING == 1
 extern "C" {
-// #include
-// "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/config.h"
-// #include
-// "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg/gstinitstaticplugins.c"
+#include "/path_to/config.h"
+#include "/path_to/gstinitstaticplugins.c"
 }
 #endif
 

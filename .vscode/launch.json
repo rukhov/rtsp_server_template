@@ -100,7 +100,10 @@
                     "name": "GST_PLUGIN_PATH",
                     "value": "/lib/x86_64-linux-gnu/gstreamer-1.0"
                 },
-                //{"name": "GST_PLUGIN_SCANNER", "value": "/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" },
+                {
+                    "name": "GST_PLUGIN_SCANNER",
+                    "value": "/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner"
+                },
                 {
                     "name": "GST_DEBUG",
                     "value": "4"
