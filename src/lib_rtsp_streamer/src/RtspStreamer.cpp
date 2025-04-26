@@ -216,7 +216,7 @@ public:
         _loop.reset(g_main_loop_new(NULL, FALSE));
 
         /* start serving */
-        log("stream ready at rtsp://127.0.0.1:%u%s\n", port, mount_point.c_str());
+        log("stream ready at rtsp://127.0.0.1:{}{}\n", port, mount_point.c_str());
 
         _thread = std::jthread([this]() {
             // This is where you would set up the server and start streaming
