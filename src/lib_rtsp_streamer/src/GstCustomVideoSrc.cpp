@@ -140,7 +140,7 @@ void _GstCustomVideoSrc::get_property(GObject* object,
 void _GstCustomVideoSrc::finalize(GObject* object)
 {
     GstCustomVideoSrc* filter = GST_CUSTOMVIDEOSRC(object);
-    filter->_frame_source.reset();
+    filter->_frame_source = nullptr;
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 

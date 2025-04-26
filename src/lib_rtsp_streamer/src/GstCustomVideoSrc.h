@@ -23,7 +23,7 @@ struct _GstCustomVideoSrc {
 
     std::string _negotiated_caps;
     GstVideoInfo _video_info;
-    std::shared_ptr<rtsp_streamer::FrameSource> _frame_source;
+    rtsp_streamer::FrameSource* _frame_source;
     std::atomic_flag _eos;
     size_t _frame_counter = 0;
     std::chrono::high_resolution_clock::time_point _next_frame;

@@ -17,7 +17,7 @@ inline void log(std::format_string<_Args...> __fmt, _Args&&... __args)
 using namespace rtsp_streamer;
 
 std::tuple<GstElement*, GstCustomVideoSrc*>
-create_custom_rtsp_pipeline(std::shared_ptr<rtsp_streamer::FrameSource>& frame_source)
+create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source)
 {
     // Create the pipeline
     GstElement* pipeline = gst_pipeline_new("rtsp-pipeline");
@@ -125,7 +125,7 @@ using gst_uncounted_ptr = std::unique_ptr<_T, decltype([](_T* ptr) { g_free(ptr)
 class RtspStreamerImpl : public RtspStreamer
 {
     std::jthread _thread;
-    std::shared_ptr<rtsp_streamer::FrameSource> _frame_source;
+    rtsp_streamer::FrameSource* _frame_source;
     gst_counted_ptr<GstRTSPServer> _server;
     gst_counted_ptr<GstCustomVideoSrc> _source;
     gst_counted_ptr<GstElement> _pipeline;
@@ -145,9 +145,7 @@ private:
     }
 
 public:
-    void start(uint16_t port,
-               std::string const& mount_point,
-               std::shared_ptr<FrameSource> frame_source)
+    void start(uint16_t port, std::string const& mount_point, FrameSource* frame_source)
     {
         if (_thread.joinable()) {
             throw std::runtime_error("RTSP server is already running");
@@ -327,12 +325,11 @@ void init(int argc, char** argv)
     gst_custom_video_src_register();
 }
 
-std::unique_ptr<RtspStreamer> make_streamer(uint16_t port,
-                                            std::string const& mount_point,
-                                            std::shared_ptr<FrameSource> frame_source)
+std::unique_ptr<RtspStreamer>
+make_streamer(uint16_t port, std::string const& mount_point, FrameSource& frame_source)
 {
     auto streamer = std::make_unique<RtspStreamerImpl>();
-    streamer->start(port, mount_point, frame_source);
+    streamer->start(port, mount_point, &frame_source);
     return streamer;
 }
 } // namespace rtsp_streamer
