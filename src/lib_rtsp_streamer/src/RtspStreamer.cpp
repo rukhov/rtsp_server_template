@@ -61,15 +61,17 @@ create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source)
         return std::make_tuple(nullptr, nullptr);
     }
 
+    auto [width, height] = frame_source->get_fraem_size();
+
     // Set properties
     // First capsfilter: video/x-raw,width=640,height=480,framerate=25/1,format=RGB
     GstCaps* caps1 = gst_caps_new_simple("video/x-raw",
                                          "width",
                                          G_TYPE_INT,
-                                         640,
+                                         width,
                                          "height",
                                          G_TYPE_INT,
-                                         480,
+                                         height,
                                          "framerate",
                                          GST_TYPE_FRACTION,
                                          25,
@@ -155,6 +157,7 @@ public:
 
         _frame_source = frame_source;
 
+
         /* create a server instance */
         _server.reset(gst_rtsp_server_new());
         g_object_ref(_server.get());
@@ -213,7 +216,7 @@ public:
         _loop.reset(g_main_loop_new(NULL, FALSE));
 
         /* start serving */
-        g_print("stream ready at rtsp://127.0.0.1:%u%s\n", port, mount_point.c_str());
+        log("stream ready at rtsp://127.0.0.1:%u%s\n", port, mount_point.c_str());
 
         _thread = std::jthread([this]() {
             // This is where you would set up the server and start streaming

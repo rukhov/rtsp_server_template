@@ -16,7 +16,11 @@ class SimpleFrameGen : public rtsp_streamer::FrameSource
     std::vector<_RGB> _image;
 
 public:
-    SimpleFrameGen() {}
+    SimpleFrameGen()
+    {
+        _format.width = 480;
+        _format.height = 360;
+    }
     ~SimpleFrameGen() {}
 
     // PictureGen
