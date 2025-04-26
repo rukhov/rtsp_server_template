@@ -216,8 +216,8 @@ GstFlowReturn _GstCustomVideoSrc::create(GstPushSrc* src, GstBuffer** buf)
         return GST_FLOW_EOS;
     }
 
-    GstBuffer* buffer =
-        gst_buffer_new_allocate(nullptr, self->_frame_source->get_ftrame_size(), nullptr);
+    GstBuffer* buffer = gst_buffer_new_allocate(
+        nullptr, self->_frame_source->get_ftrame_buffer_length(), nullptr);
     GstMapInfo map;
 
     if (gst_buffer_map(buffer, &map, GST_MAP_WRITE)) {

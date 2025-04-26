@@ -36,11 +36,21 @@ private:
 
     bool is_eof() const override { return false; }
 
-    size_t get_ftrame_size() const override { return _format.width * _format.height * 3; }
+    std::tuple<size_t /*width*/, size_t /*height*/> get_fraem_size() const override
+    {
+        return { _format.width, _format.height };
+    }
+
+    double get_pixel_ratio() const override { return 1.0; }
+
+    size_t get_ftrame_buffer_length() const override
+    {
+        return _format.width * _format.height * 3;
+    }
 
     std::span<uint8_t> get_next_frame() override
     {
-        assert(get_ftrame_size() > 0);
+        assert(get_ftrame_buffer_length() > 0);
 
         auto shift = _frame_counter % 255;
 
@@ -59,6 +69,6 @@ private:
 
         ++_frame_counter;
 
-        return { (uint8_t*)_image.data(), get_ftrame_size() };
+        return { (uint8_t*)_image.data(), get_ftrame_buffer_length() };
     }
 };
