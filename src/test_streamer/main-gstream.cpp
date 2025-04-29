@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 
     SimpleFrameGen frame_source;
 
-    auto streamer = rtsp_streamer::make_streamer(8554, "/custom_video_src", frame_source);
+    auto streamer = rtsp_streamer::make_streamer(8554, "/atv", frame_source);
 
     streamer->Join();
 
