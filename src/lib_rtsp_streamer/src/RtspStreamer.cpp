@@ -92,9 +92,9 @@ create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source)
     // x264enc properties
     g_object_set(encoder, "key-int-max", 1, NULL);
     g_object_set(encoder, "tune", "film", NULL);
-    g_object_set(encoder, "bitrate", "2000", NULL);
+    g_object_set(encoder, "bitrate", "10000", NULL);
     g_object_set(encoder, "pass", "qual", NULL);
-    g_object_set(encoder, "quantizer", "20", NULL);
+    g_object_set(encoder, "quantizer", "5", NULL);
 
     // rtph264pay properties
     g_object_set(rtppay, "pt", 96, "name", "pay0", NULL);
