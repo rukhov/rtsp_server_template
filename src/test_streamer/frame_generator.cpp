@@ -142,27 +142,21 @@ private:
 
     bool is_eof() const override { return false; }
 
-    std::tuple<size_t /*width*/, size_t /*height*/> get_fraem_size() const override
+    std::tuple<size_t /*width*/, size_t /*height*/> get_frame_size() const override
     {
         return { _format.width, _format.height };
     }
 
     double get_pixel_ratio() const override { return 1.0; }
 
-    size_t get_ftrame_buffer_length() const override
-    {
-        return _format.width * _format.height * 3;
-    }
+    size_t stride() const override { return _format.width * sizeof(_RGB); }
 
     std::span<uint8_t> get_next_frame() override
     {
-        assert(get_ftrame_buffer_length() > 0);
-
+        assert(stride() > 0);
         auto frame_num = _frame_counter % _frames.size();
-
         ++_frame_counter;
-
-        return { (uint8_t*)_frames[frame_num].data(), get_ftrame_buffer_length() };
+        return { (uint8_t*)_frames[frame_num].data(), stride() * _format.height };
     }
 };
 

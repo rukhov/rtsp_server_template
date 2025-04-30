@@ -61,7 +61,7 @@ create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source)
         return std::make_tuple(nullptr, nullptr);
     }
 
-    auto [width, height] = frame_source->get_fraem_size();
+    auto [width, height] = frame_source->get_frame_size();
 
     // Set properties
     // First capsfilter: video/x-raw,width=640,height=480,framerate=25/1,format=RGB

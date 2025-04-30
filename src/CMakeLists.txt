@@ -1,3 +1,4 @@
 
 add_subdirectory(lib_rtsp_streamer)
 add_subdirectory(test_streamer)
+add_subdirectory(simple_example)

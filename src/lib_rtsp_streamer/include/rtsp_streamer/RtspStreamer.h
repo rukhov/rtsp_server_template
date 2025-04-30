@@ -15,9 +15,9 @@ public:
 
     virtual ~FrameSource() = default;
     virtual void set_format(GstVideoInfo const& format) = 0;
-    virtual std::tuple<size_t /*width*/, size_t /*height*/> get_fraem_size() const = 0;
+    virtual std::tuple<size_t /*width*/, size_t /*height*/> get_frame_size() const = 0;
     virtual double /* width / heigth */ get_pixel_ratio() const = 0;
-    virtual size_t get_ftrame_buffer_length() const = 0;
+    virtual size_t stride() const = 0; // stride size in bytes
     virtual bool is_eof() const = 0;
     virtual std::span<uint8_t> get_next_frame() = 0;
 };
