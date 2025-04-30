@@ -94,7 +94,7 @@
                 //{"name": "GST_PLUGIN_SCANNER", "value": "/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" },
                 {
                     "name": "GST_DEBUG",
-                    "value": "4"
+                    "value": "3"
                 },
             ],
             "stopAtEntry": false,

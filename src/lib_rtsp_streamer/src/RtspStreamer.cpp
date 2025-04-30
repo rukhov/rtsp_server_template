@@ -91,10 +91,40 @@ create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source)
 
     // x264enc properties
     g_object_set(encoder, "key-int-max", 1, NULL);
-    g_object_set(encoder, "tune", "film", NULL);
-    g_object_set(encoder, "bitrate", "10000", NULL);
-    g_object_set(encoder, "pass", "qual", NULL);
-    g_object_set(encoder, "quantizer", "5", NULL);
+
+    /*tune: stillimage (0x00000001), fastdecode (0x00000002), zerolatency (0x00000004)*/
+    // g_object_set(encoder, "tune", 1 NULL);
+
+    //  Subpixel motion estimation and
+    //  partition decision quality : 1 = fast, 10 = best */
+    //  g_object_set(encoder, "subme", 10, NULL);
+
+    /*
+    "speed-preset":
+    None (0) – No preset
+    ultrafast (1) – ultrafast
+    superfast (2) – superfast
+    veryfast (3) – veryfast
+    faster (4) – faster
+    fast (5) – fast
+    medium (6) – medium
+    slow (7) – slow
+    slower (8) – slower
+    veryslow (9) – veryslow
+    placebo (10) – placebo*/
+    // g_object_set(encoder, "speed-preset", 6, NULL);
+
+    /* Number of threads used by the codec (0 for automatic)*/
+    // g_object_set(encoder, "threads", 0, NULL);
+
+
+    // g_object_set(encoder, "pass", "qual", NULL);
+    // g_object_set(encoder, "quantizer", "1", NULL);
+    // g_object_set(encoder, "profile", "high", NULL);
+    // g_object_set(encoder, "speed-preset", "veryslow", NULL);
+    // g_object_set(encoder, "preset", "high-quality", NULL);
+    // g_object_set(encoder, "rc-mode", "constqp", NULL);
+    // g_object_set(encoder, "bitrate", "2048", NULL);
 
     // rtph264pay properties
     g_object_set(rtppay, "pt", 96, "name", "pay0", NULL);
