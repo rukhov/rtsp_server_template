@@ -110,6 +110,39 @@
             ]
         },
         {
+            "name": "Linux - simple_exmaple",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/../build/src/simple_example/simple_example",
+            "args": [],
+            "environment": [
+                //{"name": "LD_LIBRARY_PATH", "value": "/lib/x86_64-linux-gnu" },
+                //{"name": "GST_PLUGIN_SYSTEM_PATH_1_0", "value": "" },
+                //{"name": "GST_PLUGIN_PATH","value": "/lib/x86_64-linux-gnu" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib" },
+                //{"name": "GST_PLUGIN_PATH", "value": "/home/rukhov/projects/github/vcpkg/buildtrees/gstreamer/x64-linux-dbg" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib/gstreamer-1.0:/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/lib:/lib/x86_64-linux-gnu" },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_PATH", "value": "/lib/x86_64-linux-gnu/gstreamer-1.0" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner" },
+                {
+                    "name": "GST_DEBUG",
+                    "value": "3"
+                },
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../build/src/test_streamer",
+            "externalConsole": false,
+            "avoidWindowsConsoleRedirection": true,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "Windows - Test",
             "type": "cppvsdbg",
             "request": "launch",
