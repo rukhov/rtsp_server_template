@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.28)
 
 project(rtsp_server_template VERSION 1.0.0 LANGUAGES CXX C)
 
+option(BUILD_EXAMPLES "Build examples" ON)
+
 set(CMAKE_CXX_STANDARD_REQUIRED On)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS Off)
