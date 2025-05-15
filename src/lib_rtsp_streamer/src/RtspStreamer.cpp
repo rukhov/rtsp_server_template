@@ -17,7 +17,7 @@ inline void log(std::format_string<_Args...> __fmt, _Args&&... __args)
 using namespace rtsp_streamer;
 
 std::tuple<GstElement*, GstCustomVideoSrc*>
-create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source)
+create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source, uint32_t bitrate)
 {
     // Create the pipeline
     GstElement* pipeline = gst_pipeline_new("rtsp-pipeline");
@@ -124,7 +124,9 @@ create_custom_rtsp_pipeline(rtsp_streamer::FrameSource* frame_source)
     // g_object_set(encoder, "speed-preset", "veryslow", NULL);
     // g_object_set(encoder, "preset", "high-quality", NULL);
     // g_object_set(encoder, "rc-mode", "constqp", NULL);
-    // g_object_set(encoder, "bitrate", "2048", NULL);
+    g_object_set(encoder, "bitrate", bitrate, NULL);
+    // g_object_set(encoder, "qp-min", 18, NULL);
+
 
     // rtph264pay properties
     g_object_set(rtppay, "pt", 96, "name", "pay0", NULL);
@@ -181,7 +183,10 @@ private:
     }
 
 public:
-    void start(uint16_t port, std::string const& mount_point, FrameSource* frame_source)
+    void start(uint16_t port,
+               std::string const& mount_point,
+               FrameSource* frame_source,
+               uint32_t bitrate)
     {
         if (_thread.joinable()) {
             throw std::runtime_error("RTSP server is already running");
@@ -220,7 +225,8 @@ public:
                 "! rtph264pay config-interval=-1 pt=96 name=pay0 )");
         } else {
 
-            auto [pipeline_, source] = create_custom_rtsp_pipeline(_frame_source);
+            auto [pipeline_, source] =
+                create_custom_rtsp_pipeline(_frame_source, bitrate);
             if (!pipeline_ || !source) {
                 throw std::runtime_error("Failed to create pipeline");
             }
@@ -362,11 +368,13 @@ void init(int argc, char** argv)
     gst_custom_video_src_register();
 }
 
-std::unique_ptr<RtspStreamer>
-make_streamer(uint16_t port, std::string const& mount_point, FrameSource& frame_source)
+std::unique_ptr<RtspStreamer> make_streamer(uint16_t port,
+                                            std::string const& mount_point,
+                                            FrameSource& frame_source,
+                                            uint32_t bitrate)
 {
     auto streamer = std::make_unique<RtspStreamerImpl>();
-    streamer->start(port, mount_point, &frame_source);
+    streamer->start(port, mount_point, &frame_source, bitrate);
     return streamer;
 }
 } // namespace rtsp_streamer
