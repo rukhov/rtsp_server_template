@@ -143,19 +143,20 @@
             ]
         },
         {
-            "name": "Windows - Test",
+            "name": "Windows - simple_exmaple",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/../build/src/test_streamer/Debug/test_streamer.exe",
+            "program": "${workspaceFolder}\\..\\build\\src\\simple_example\\Debug\\simple_example.exe",
             "args": [],
             "environment": [
+                //{"name": "PATH", "value": "${workspaceFolder}\\..\\build\\vcpkg_installed\\x64-windows\\debug\\plugins;${workspaceFolder}\\..\\build\\src\\simple_example\\Debug;${workspaceFolder}\\..\\build\\vcpkg_installed\\x64-windows\\debug\\bin" },
                 {
                     "name": "GST_PLUGIN_SYSTEM_PATH_1_0",
-                    "value": "${workspaceFolder}/../build/src/test_streamer/Debug"
+                    "value": "${workspaceFolder}\\..\\build\\src\\simple_example\\Debug"
                 },
                 {
                     "name": "GST_PLUGIN_PATH",
-                    "value": "${workspaceFolder}/../build/src/test_streamer/Debug"
+                    "value": "${workspaceFolder}\\..\\build\\vcpkg_installed\\x64-windows\\debug\\plugins"
                 },
                 //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
                 //{"name": "GST_PLUGIN_SCANNER", "value": "/home/rukhov/projects/github/rtsp_server_sample/build/vcpkg_installed/x64-linux/tools/gstreamer/gst-plugin-scanner" },
@@ -165,9 +166,9 @@
                 },
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/../build/src/test_streamer/Debug",
+            "cwd": "${workspaceFolder}\\..\\build\\src\\simple_example\\Debug",
             "externalConsole": true,
-            //"avoidWindowsConsoleRedirection": true,
+            "avoidWindowsConsoleRedirection": true,
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
