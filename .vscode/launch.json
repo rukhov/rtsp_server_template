@@ -143,7 +143,7 @@
             ]
         },
         {
-            "name": "Windows - simple_exmaple",
+            "name": "Windows - simple_exmaple - Debug",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}\\..\\build\\src\\simple_example\\Debug\\simple_example.exe",
@@ -167,6 +167,41 @@
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}\\..\\build\\src\\simple_example\\Debug",
+            "externalConsole": true,
+            "avoidWindowsConsoleRedirection": true,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Windows - simple_exmaple - RelWithDebInfo",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\..\\build\\src\\simple_example\\RelWithDebInfo\\simple_example.exe",
+            "args": [],
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "${workspaceFolder}\\..\\build\\vcpkg_installed\\x64-windows\\bin"
+                },
+                //{"name": "GST_PLUGIN_SYSTEM_PATH_1_0", "value": "${workspaceFolder}\\..\\build\\src\\simple_example\\RelWithDebInfo" },
+                {
+                    "name": "GST_PLUGIN_PATH",
+                    "value": "${workspaceFolder}\\..\\build\\vcpkg_installed\\x64-windows\\plugins"
+                },
+                //{"name": "GST_PLUGIN_PATH","value": "/home/rukhov/projects/github/vcpkg/packages/gstreamer_x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                //{"name": "GST_PLUGIN_SCANNER", "value": "/home/rukhov/projects/github/rtsp_server_sample/build/vcpkg_installed/x64-linux/tools/gstreamer/gst-plugin-scanner" },
+                {
+                    "name": "GST_DEBUG",
+                    "value": "4"
+                },
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}\\..\\build\\src\\simple_example\\RelWithDebInfo",
             "externalConsole": true,
             "avoidWindowsConsoleRedirection": true,
             "setupCommands": [
